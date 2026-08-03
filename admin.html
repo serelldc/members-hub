@@ -180,10 +180,22 @@ $("gateForm").addEventListener("submit", async e => {
 });
 $("out").onclick = async () => { await sb.auth.signOut(); location.reload(); };
 
-(async () => {
+let booted = false;
+
+async function init(){
+  if (booted) return;
+
   const { data:{ session } } = await sb.auth.getSession();
-  if (!session) return $("gate").classList.remove("hide");
-  const { data:prof } = await sb.from("profiles").select("is_admin").eq("id", session.user.id).single();
+  if (!session) { $("gate").classList.remove("hide"); return; }
+
+  const { data:prof, error } = await sb.from("profiles")
+    .select("is_admin").eq("id", session.user.id).maybeSingle();
+
+  if (error) {
+    $("gate").classList.remove("hide");
+    msg("gateMsg", "Hindi ma-load ang profile: " + esc(error.message));
+    return;
+  }
   if (!prof?.is_admin) {
     $("gate").classList.remove("hide");
     msg("gateMsg", "Hindi admin ang account na ito.<br><br>Sa Supabase SQL Editor, i-run:<br>" +
@@ -192,10 +204,21 @@ $("out").onclick = async () => { await sb.auth.signOut(); location.reload(); };
     await sb.auth.signOut();
     return;
   }
+
+  booted = true;
+  $("gate").classList.add("hide");
   $("app").classList.remove("hide");
   loadAll();
-})();
-sb.auth.onAuthStateChange((e) => { if (e === "SIGNED_IN") location.reload(); });
+}
+
+// Huwag mag-reload dito — pinaputok ng Supabase ang SIGNED_IN sa bawat
+// page load at token refresh, kaya magiging infinite reload loop iyon.
+sb.auth.onAuthStateChange((e) => {
+  if (e === "SIGNED_OUT") location.reload();
+  else init();
+});
+
+init();
 
 /* ─── TABS ─── */
 document.querySelectorAll("[data-tab]").forEach(b => {
