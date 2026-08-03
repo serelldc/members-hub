@@ -118,7 +118,9 @@ create trigger on_auth_user_created
 create or replace function public.protect_profile_fields()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
-  if not public.is_admin() then
+  -- auth.uid() ay NULL kapag galing sa SQL editor o service_role —
+  -- server-side iyon, at protektado na ng RLS ang browser requests.
+  if auth.uid() is not null and not public.is_admin() then
     new.tier       := old.tier;
     new.is_admin   := old.is_admin;
     new.expires_at := old.expires_at;
