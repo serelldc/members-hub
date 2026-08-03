@@ -15,8 +15,8 @@ window.CFG = {
 
 
   /* ── 2. BRANDING ──────────────────────────────────────────────── */
-  brandName: "Members Hub",
-  initial:   "R",
+  brandName: "SRDC Members Hub",
+  initial:   "S",
   tagline:   "Lahat ng digital products mo, nasa isang lugar.",
 
   /* Banner sa dashboard. Gawing "" para itago. Pwede ang HTML. */
@@ -32,20 +32,18 @@ window.CFG = {
     qrImage: ""                  // opsyonal: URL ng GCash QR code image
   },
 
-  /* Presyo kada tier. Ipapakita sa upgrade page. */
+  /* Presyo ng membership. Ipapakita sa upgrade page.
+     ISANG TIER lang ngayon — ₱2,500 all-access.
+     Kung gusto mong magdagdag ng pangalawang tier balang araw,
+     idagdag lang ang `vip: { price: ..., label: ..., perks: [...] }`
+     dito — handa na ang database at ang site para dito. */
   pricing: {
-    premium: { price: 499,  label: "Premium",   perks: [
-      "Lahat ng free products",
-      "40+ Canva templates",
-      "Video trainings",
-      "Business tracker spreadsheet"
-    ]},
-    vip:     { price: 1499, label: "VIP Vault", perks: [
-      "Lahat ng nasa Premium",
-      "Complete bundle ng lahat ng products",
-      "Lahat ng future releases — libre",
-      "Private coaching replays",
-      "Priority support"
+    premium: { price: 2500, label: "All-Access Membership", perks: [
+      "Lahat ng digital products — walang exception",
+      "Lahat ng future releases, libre habambuhay",
+      "Templates, guides, at trainings",
+      "Instant download anytime, kahit ilang beses",
+      "Priority support via email"
     ]}
   },
 
