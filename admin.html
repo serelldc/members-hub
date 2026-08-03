@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="tl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Admin — Members Hub</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="gate" class="auth-wrap hide">
+  <div class="auth-box">
+    <div class="brand-mark">🔐</div>
+    <h1>Admin Panel</h1>
+    <p class="sub" id="gateSub">Mag-login gamit ang admin account mo.</p>
+    <div id="gateMsg" class="msg hide"></div>
+    <form id="gateForm">
+      <div class="field"><label for="em">Email</label>
+        <input type="email" id="em" autocomplete="username" required></div>
+      <div class="field"><label for="pw">Password</label>
+        <input type="password" id="pw" autocomplete="current-password" required></div>
+      <button type="submit" class="btn full" id="gateBtn">Mag-login</button>
+    </form>
+    <p style="text-align:center;margin-top:16px;font-size:13px">
+      <a href="index.html" style="color:var(--muted);text-decoration:none">← Balik sa members hub</a></p>
+  </div>
+</div>
+
+<div id="app" class="hide">
+  <header class="topbar">
+    <div class="topbar-in">
+      <a class="logo" href="index.html"><span class="dot">⚙</span><span>Admin Panel</span></a>
+      <div class="spacer"></div>
+      <a href="index.html" class="btn ghost sm">Members view</a>
+      <button class="btn ghost sm" id="out">Logout</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="stats">
+      <div class="stat"><div class="n" id="kPending">0</div><div class="l">Naghihintay ng approval</div></div>
+      <div class="stat"><div class="n" id="kMembers">0</div><div class="l">Total members</div></div>
+      <div class="stat"><div class="n" id="kPaid">0</div><div class="l">Paying members</div></div>
+      <div class="stat"><div class="n" id="kProducts">0</div><div class="l">Products</div></div>
+    </div>
+
+    <div class="chips" style="margin-bottom:20px">
+      <button class="chip on" data-tab="pay">💰 Bayad</button>
+      <button class="chip" data-tab="prod">📦 Products</button>
+      <button class="chip" data-tab="mem">👥 Members</button>
+    </div>
+
+    <!-- ══ PAYMENTS ══ -->
+    <section id="tab-pay">
+      <div id="payMsg" class="msg hide"></div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Petsa</th><th>Member</th><th>Plan</th><th>Halaga</th>
+          <th>Reference</th><th>Proof</th><th>Status</th><th></th></tr></thead>
+        <tbody id="payBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Nilo-load...</td></tr></tbody>
+      </table></div>
+    </section>
+
+    <!-- ══ PRODUCTS ══ -->
+    <section id="tab-prod" class="hide">
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn" id="newProd">+ Bagong product</button>
+        <div class="spacer"></div>
+      </div>
+      <div id="prodMsg" class="msg hide"></div>
+      <div class="tblwrap"><table>
+        <thead><tr><th></th><th>Title</th><th>Kategorya</th><th>Uri</th>
+          <th>Tier</th><th>Source</th><th>Live</th><th></th></tr></thead>
+        <tbody id="prodBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Nilo-load...</td></tr></tbody>
+      </table></div>
+    </section>
+
+    <!-- ══ MEMBERS ══ -->
+    <section id="tab-mem" class="hide">
+      <div class="toolbar" style="margin-bottom:14px">
+        <div class="search"><span class="ic">🔍</span>
+          <input type="search" id="memQ" placeholder="Hanapin ang member..."></div>
+      </div>
+      <div id="memMsg" class="msg hide"></div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Pangalan</th><th>Email</th><th>Tier</th><th>Downloads</th>
+          <th>Sumali</th><th>Expires</th><th></th></tr></thead>
+        <tbody id="memBody"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px">Nilo-load...</td></tr></tbody>
+      </table></div>
+    </section>
+  </main>
+</div>
+
+<!-- ══ PRODUCT MODAL ══ -->
+<div id="modal" class="modal hide">
+  <div class="modal-box">
+    <h3 id="mTitle">Bagong product</h3>
+    <div id="mMsg" class="msg hide"></div>
+    <form id="prodForm">
+      <input type="hidden" id="fId">
+      <div class="field"><label for="fTitle">Title</label>
+        <input type="text" id="fTitle" required></div>
+      <div class="field"><label for="fDesc">Description</label>
+        <textarea id="fDesc" placeholder="1–2 pangungusap tungkol sa product."></textarea></div>
+      <div class="row2">
+        <div class="field"><label for="fCat">Kategorya</label>
+          <input type="text" id="fCat" placeholder="Templates" required></div>
+        <div class="field"><label for="fKind">Uri</label>
+          <input type="text" id="fKind" placeholder="PDF" required></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label for="fTier">Minimum tier</label>
+          <select id="fTier">
+            <option value="free">Free — lahat makakakita</option>
+            <option value="premium">Premium</option>
+            <option value="vip">VIP</option>
+          </select></div>
+        <div class="field"><label for="fSize">File size (display)</label>
+          <input type="text" id="fSize" placeholder="2.4 MB"></div>
+      </div>
+      <div class="field"><label for="fCover">Cover — emoji o image URL</label>
+        <input type="text" id="fCover" placeholder="📦"></div>
+
+      <div class="field">
+        <label for="fFile">I-upload ang file (secure — Supabase Storage)</label>
+        <input type="file" id="fFile">
+        <div class="hint" id="curFile">Para sa PDF, template, at maliliit na file. Signed link na nag-e-expire ang makukuha ng member.</div>
+      </div>
+      <div class="field">
+        <label for="fUrl">…O Google Drive link (para sa malalaking video)</label>
+        <input type="url" id="fUrl" placeholder="https://drive.google.com/...">
+        <div class="hint">Kung may na-upload kang file sa taas, iyon ang gagamitin. Isa lang ang kailangan.</div>
+      </div>
+      <div class="field">
+        <label style="display:flex;align-items:center;gap:9px;text-transform:none;font-size:14px;color:var(--txt)">
+          <input type="checkbox" id="fPub" checked style="width:auto;margin:0"> Live (nakikita ng members)
+        </label>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn ghost" id="mCancel">Cancel</button>
+        <button type="submit" class="btn" id="mSave">I-save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
+
+const C = window.CFG;
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;")
+  .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+const fmt = d => d ? new Date(d).toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"}) : "—";
+const peso = n => n == null ? "—" : "₱" + Number(n).toLocaleString("en-PH",{minimumFractionDigits:2});
+
+if (C.SUPABASE_URL.includes("YOUR-PROJECT-REF")) {
+  document.body.innerHTML = '<div class="auth-wrap"><div class="auth-box"><div class="msg err">' +
+    "<b>Hindi pa naka-setup.</b><br><br>Punan muna ang <code>config.js</code>.</div></div></div>";
+  throw new Error("config not set");
+}
+const sb = createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY);
+
+let members = [], payments = [], prods = [];
+
+function msg(id, text, kind){
+  const e = $(id); e.className = "msg " + (kind||"err"); e.innerHTML = text; e.classList.remove("hide");
+  if (kind === "ok") setTimeout(() => e.classList.add("hide"), 4000);
+}
+
+/* ─── GATE ─── */
+$("gateForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  $("gateBtn").disabled = true;
+  const { error } = await sb.auth.signInWithPassword({
+    email: $("em").value.trim().toLowerCase(), password: $("pw").value });
+  $("gateBtn").disabled = false;
+  if (error) msg("gateMsg", "Mali ang email o password.");
+});
+$("out").onclick = async () => { await sb.auth.signOut(); location.reload(); };
+
+(async () => {
+  const { data:{ session } } = await sb.auth.getSession();
+  if (!session) return $("gate").classList.remove("hide");
+  const { data:prof } = await sb.from("profiles").select("is_admin").eq("id", session.user.id).single();
+  if (!prof?.is_admin) {
+    $("gate").classList.remove("hide");
+    msg("gateMsg", "Hindi admin ang account na ito.<br><br>Sa Supabase SQL Editor, i-run:<br>" +
+      "<code style='display:block;margin-top:8px;font-size:11.5px;line-height:1.6'>update public.profiles set is_admin=true, tier='vip' where email='" +
+      esc(session.user.email) + "';</code>");
+    await sb.auth.signOut();
+    return;
+  }
+  $("app").classList.remove("hide");
+  loadAll();
+})();
+sb.auth.onAuthStateChange((e) => { if (e === "SIGNED_IN") location.reload(); });
+
+/* ─── TABS ─── */
+document.querySelectorAll("[data-tab]").forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll("[data-tab]").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    ["pay","prod","mem"].forEach(t => $("tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
+  };
+});
+
+async function loadAll(){
+  // Members muna — kailangan ng payments table ang pangalan/email nila.
+  await loadMembers();
+  await Promise.all([loadPayments(), loadProducts()]);
+}
+
+/* ═══ PAYMENTS ═══ */
+async function loadPayments(){
+  const { data, error } = await sb.from("payment_requests")
+    .select("*").order("status").order("created_at", { ascending:false });
+  if (error) return msg("payMsg", esc(error.message));
+  payments = data || [];
+  $("kPending").textContent = payments.filter(p => p.status === "pending").length;
+
+  if (!payments.length) {
+    $("payBody").innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:36px">Wala pang payment request.</td></tr>';
+    return;
+  }
+
+  $("payBody").innerHTML = payments.map(p => {
+    const m = members.find(x => x.id === p.user_id);
+    return "<tr>" +
+      "<td>" + fmt(p.created_at) + "</td>" +
+      "<td><b>" + esc(m?.full_name || "—") + "</b><br><small style='color:var(--muted)'>" +
+        esc(m?.email || p.user_id.slice(0,8)) + "</small></td>" +
+      '<td><span class="tier-badge tier-' + p.requested_tier + '">' + esc(p.requested_tier) + "</span></td>" +
+      "<td>" + peso(p.amount) + "</td>" +
+      "<td><code style='font-size:12px'>" + esc(p.reference || "—") + "</code></td>" +
+      "<td>" + (p.proof_path ? '<button class="btn ghost sm" data-proof="' + esc(p.proof_path) + '">Tingnan</button>' : "—") + "</td>" +
+      '<td><span class="st st-' + p.status + '">' + p.status + "</span>" +
+        (p.admin_note ? "<br><small style='color:var(--muted)'>" + esc(p.admin_note) + "</small>" : "") + "</td>" +
+      '<td class="actions">' + (p.status === "pending"
+        ? '<button class="btn ok sm" data-ok="' + p.id + '">Approve</button>' +
+          '<button class="btn bad sm" data-no="' + p.id + '">Reject</button>'
+        : "") + "</td></tr>";
+  }).join("");
+
+  $("payBody").querySelectorAll("[data-proof]").forEach(b => {
+    b.onclick = async () => {
+      const { data, error } = await sb.storage.from("proofs").createSignedUrl(b.dataset.proof, 600);
+      if (error) return alert("Hindi mabuksan: " + error.message);
+      window.open(data.signedUrl, "_blank", "noopener");
+    };
+  });
+  $("payBody").querySelectorAll("[data-ok]").forEach(b => {
+    b.onclick = async () => {
+      if (!confirm("I-approve at i-upgrade ang member na ito?")) return;
+      b.disabled = true;
+      const { error } = await sb.rpc("approve_payment", { req_id: b.dataset.ok, note: null });
+      if (error) { msg("payMsg", esc(error.message)); b.disabled = false; return; }
+      msg("payMsg", "✅ Na-approve! Na-upgrade na ang tier ng member.", "ok");
+      await loadMembers(); loadPayments();
+    };
+  });
+  $("payBody").querySelectorAll("[data-no]").forEach(b => {
+    b.onclick = async () => {
+      const note = prompt("Dahilan ng pag-reject (makikita ng member):", "Hindi tugma ang reference number.");
+      if (note === null) return;
+      b.disabled = true;
+      const { error } = await sb.rpc("reject_payment", { req_id: b.dataset.no, note });
+      if (error) { msg("payMsg", esc(error.message)); b.disabled = false; return; }
+      msg("payMsg", "Na-reject ang request.", "ok");
+      loadPayments();
+    };
+  });
+}
+
+/* ═══ PRODUCTS ═══ */
+async function loadProducts(){
+  const { data, error } = await sb.from("products")
+    .select("*").order("sort_order").order("created_at", { ascending:false });
+  if (error) return msg("prodMsg", esc(error.message));
+  prods = data || [];
+  $("kProducts").textContent = prods.length;
+
+  if (!prods.length) {
+    $("prodBody").innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:36px">Wala pang products. I-click ang “+ Bagong product”.</td></tr>';
+    return;
+  }
+  $("prodBody").innerHTML = prods.map(p => {
+    const img = /^https?:\/\//.test(p.cover || "");
+    return "<tr>" +
+      '<td style="font-size:22px;width:44px">' + (img ? '<img src="' + esc(p.cover) +
+        '" style="width:34px;height:34px;object-fit:cover;border-radius:7px">' : esc(p.cover || "📦")) + "</td>" +
+      "<td><b>" + esc(p.title) + "</b>" + (p.file_size ? "<br><small style='color:var(--muted)'>" + esc(p.file_size) + "</small>" : "") + "</td>" +
+      "<td>" + esc(p.category) + "</td><td>" + esc(p.kind) + "</td>" +
+      '<td><span class="tier-badge tier-' + p.tier + '">' + esc(p.tier) + "</span></td>" +
+      "<td>" + (p.storage_path ? "🔒 Storage" : p.external_url ? "🔗 Link" : "<span style='color:var(--danger)'>⚠ Wala</span>") + "</td>" +
+      "<td>" + (p.published ? "✅" : "⏸") + "</td>" +
+      '<td class="actions"><button class="btn ghost sm" data-edit="' + p.id + '">Edit</button>' +
+        '<button class="btn bad sm" data-del="' + p.id + '">Delete</button></td></tr>';
+  }).join("");
+
+  $("prodBody").querySelectorAll("[data-edit]").forEach(b => { b.onclick = () => openModal(b.dataset.edit); });
+  $("prodBody").querySelectorAll("[data-del]").forEach(b => {
+    b.onclick = async () => {
+      const p = prods.find(x => x.id === b.dataset.del);
+      if (!confirm('Burahin ang "' + p.title + '"? Hindi na ito maibabalik.')) return;
+      if (p.storage_path) await sb.storage.from("products").remove([p.storage_path]);
+      const { error } = await sb.from("products").delete().eq("id", p.id);
+      if (error) return msg("prodMsg", esc(error.message));
+      msg("prodMsg", "Nabura ang product.", "ok");
+      loadProducts();
+    };
+  });
+}
+
+$("newProd").onclick = () => openModal(null);
+$("mCancel").onclick = () => $("modal").classList.add("hide");
+$("modal").onclick = e => { if (e.target.id === "modal") $("modal").classList.add("hide"); };
+
+function openModal(id){
+  const p = id ? prods.find(x => x.id === id) : null;
+  $("mTitle").textContent = p ? "I-edit ang product" : "Bagong product";
+  $("fId").value    = p?.id || "";
+  $("fTitle").value = p?.title || "";
+  $("fDesc").value  = p?.description || "";
+  $("fCat").value   = p?.category || "General";
+  $("fKind").value  = p?.kind || "PDF";
+  $("fTier").value  = p?.tier || "free";
+  $("fSize").value  = p?.file_size || "";
+  $("fCover").value = p?.cover || "📦";
+  $("fUrl").value   = p?.external_url || "";
+  $("fPub").checked = p ? p.published : true;
+  $("fFile").value  = "";
+  $("curFile").innerHTML = p?.storage_path
+    ? "Kasalukuyang file: <b>" + esc(p.storage_path.split("/").pop()) + "</b> — mag-upload lang kung papalitan mo."
+    : "Para sa PDF, template, at maliliit na file. Signed link na nag-e-expire ang makukuha ng member.";
+  $("mMsg").classList.add("hide");
+  $("modal").classList.remove("hide");
+}
+
+$("prodForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = $("mSave");
+  btn.disabled = true;
+  btn.textContent = "Ini-save...";
+  try {
+    const id = $("fId").value;
+    const rec = {
+      title: $("fTitle").value.trim(),
+      description: $("fDesc").value.trim(),
+      category: $("fCat").value.trim() || "General",
+      kind: $("fKind").value.trim() || "PDF",
+      tier: $("fTier").value,
+      file_size: $("fSize").value.trim() || null,
+      cover: $("fCover").value.trim() || "📦",
+      external_url: $("fUrl").value.trim() || null,
+      published: $("fPub").checked
+    };
+
+    const file = $("fFile").files[0];
+    if (file) {
+      btn.textContent = "Ini-upload ang file...";
+      const safe = file.name.replace(/[^\w.\-]+/g, "_");
+      const path = Date.now() + "_" + safe;
+      const { error:upErr } = await sb.storage.from("products").upload(path, file, { upsert:false });
+      if (upErr) throw upErr;
+      rec.storage_path = path;
+      if (!rec.file_size) rec.file_size = (file.size / 1048576).toFixed(1) + " MB";
+      const old = id ? prods.find(x => x.id === id)?.storage_path : null;
+      if (old) await sb.storage.from("products").remove([old]);
+    }
+
+    const { error } = id
+      ? await sb.from("products").update(rec).eq("id", id)
+      : await sb.from("products").insert(rec);
+    if (error) throw error;
+
+    $("modal").classList.add("hide");
+    msg("prodMsg", "✅ Na-save ang product.", "ok");
+    loadProducts();
+  } catch(err) {
+    msg("mMsg", esc(err.message || "May nangyaring mali."));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "I-save";
+  }
+});
+
+/* ═══ MEMBERS ═══ */
+async function loadMembers(){
+  const { data, error } = await sb.rpc("admin_list_members");
+  if (error) return msg("memMsg", esc(error.message));
+  members = data || [];
+  $("kMembers").textContent = members.length;
+  $("kPaid").textContent = members.filter(m => m.tier !== "free").length;
+  renderMembers();
+}
+
+$("memQ").oninput = renderMembers;
+
+function renderMembers(){
+  const q = $("memQ").value.toLowerCase();
+  const list = members.filter(m =>
+    !q || (m.full_name + " " + m.email).toLowerCase().includes(q));
+
+  if (!list.length) {
+    $("memBody").innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:36px">Walang nahanap.</td></tr>';
+    return;
+  }
+  $("memBody").innerHTML = list.map(m => "<tr>" +
+    "<td><b>" + esc(m.full_name || "—") + "</b>" + (m.is_admin ? ' <span class="pill">admin</span>' : "") + "</td>" +
+    "<td style='color:var(--muted)'>" + esc(m.email) + "</td>" +
+    '<td><select data-tier="' + m.id + '" style="background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px 9px">' +
+      ["free","premium","vip"].map(t => '<option value="' + t + '"' + (m.tier === t ? " selected" : "") + ">" + t + "</option>").join("") +
+    "</select></td>" +
+    "<td>" + m.downloads + "</td>" +
+    "<td>" + fmt(m.created_at) + "</td>" +
+    "<td>" + (m.expires_at ? fmt(m.expires_at) : "<span style='color:var(--muted)'>walang expiry</span>") + "</td>" +
+    '<td class="actions"><button class="btn ghost sm" data-exp="' + m.id + '">Set expiry</button></td></tr>').join("");
+
+  $("memBody").querySelectorAll("[data-tier]").forEach(s => {
+    s.onchange = async () => {
+      const m = members.find(x => x.id === s.dataset.tier);
+      const { error } = await sb.rpc("set_member_tier",
+        { target: m.id, new_tier: s.value, until: m.expires_at });
+      if (error) { msg("memMsg", esc(error.message)); s.value = m.tier; return; }
+      msg("memMsg", "✅ Na-update ang tier ni " + esc(m.full_name || m.email) + " → " + s.value, "ok");
+      loadMembers();
+    };
+  });
+  $("memBody").querySelectorAll("[data-exp]").forEach(b => {
+    b.onclick = async () => {
+      const m = members.find(x => x.id === b.dataset.exp);
+      const v = prompt("Petsa ng expiry (YYYY-MM-DD). Iwanang blangko para walang expiry:",
+        m.expires_at ? m.expires_at.slice(0,10) : "");
+      if (v === null) return;
+      const until = v.trim() ? new Date(v.trim() + "T23:59:59").toISOString() : null;
+      const { error } = await sb.rpc("set_member_tier", { target: m.id, new_tier: m.tier, until });
+      if (error) return msg("memMsg", esc(error.message));
+      msg("memMsg", "✅ Na-update ang expiry.", "ok");
+      loadMembers();
+    };
+  });
+}
+</script>
+</body>
+</html>
