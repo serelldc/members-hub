@@ -40,9 +40,9 @@
   <main>
     <div class="stats">
       <div class="stat"><div class="n" id="kPending">0</div><div class="l">Naghihintay ng approval</div></div>
-      <div class="stat"><div class="n" id="kMembers">0</div><div class="l">Total members</div></div>
-      <div class="stat"><div class="n" id="kPaid">0</div><div class="l">Paying members</div></div>
-      <div class="stat"><div class="n" id="kProducts">0</div><div class="l">Products</div></div>
+      <div class="stat"><div class="n" id="kMembers">0</div><div class="l">Kabuuang members</div></div>
+      <div class="stat"><div class="n" id="kPaid">0</div><div class="l">May bayad na members</div></div>
+      <div class="stat"><div class="n" id="kProducts">0</div><div class="l">Mga product</div></div>
     </div>
 
     <div class="chips" style="margin-bottom:20px">
@@ -56,7 +56,7 @@
       <div id="payMsg" class="msg hide"></div>
       <div class="tblwrap"><table>
         <thead><tr><th>Petsa</th><th>Member</th><th>Plan</th><th>Halaga</th>
-          <th>Reference</th><th>Proof</th><th>Status</th><th></th></tr></thead>
+          <th>Reference</th><th>Patunay</th><th>Status</th><th></th></tr></thead>
         <tbody id="payBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Nilo-load...</td></tr></tbody>
       </table></div>
     </section>
@@ -69,7 +69,7 @@
       </div>
       <div id="prodMsg" class="msg hide"></div>
       <div class="tblwrap"><table>
-        <thead><tr><th></th><th>Title</th><th>Kategorya</th><th>Uri</th>
+        <thead><tr><th></th><th>Pamagat</th><th>Kategorya</th><th>Uri</th>
           <th>Tier</th><th>Source</th><th>Live</th><th></th></tr></thead>
         <tbody id="prodBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Nilo-load...</td></tr></tbody>
       </table></div>
@@ -84,7 +84,7 @@
       <div id="memMsg" class="msg hide"></div>
       <div class="tblwrap"><table>
         <thead><tr><th>Pangalan</th><th>Email</th><th>Tier</th><th>Downloads</th>
-          <th>Sumali</th><th>Expires</th><th></th></tr></thead>
+          <th>Sumali</th><th>Mag-e-expire</th><th></th></tr></thead>
         <tbody id="memBody"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px">Nilo-load...</td></tr></tbody>
       </table></div>
     </section>
@@ -98,9 +98,9 @@
     <div id="mMsg" class="msg hide"></div>
     <form id="prodForm">
       <input type="hidden" id="fId">
-      <div class="field"><label for="fTitle">Title</label>
+      <div class="field"><label for="fTitle">Pamagat</label>
         <input type="text" id="fTitle" required></div>
-      <div class="field"><label for="fDesc">Description</label>
+      <div class="field"><label for="fDesc">Deskripsyon</label>
         <textarea id="fDesc" placeholder="1–2 pangungusap tungkol sa product."></textarea></div>
       <div class="row2">
         <div class="field"><label for="fCat">Kategorya</label>
@@ -109,7 +109,7 @@
           <input type="text" id="fKind" placeholder="PDF" required></div>
       </div>
       <div class="row2">
-        <div class="field"><label for="fTier">Minimum tier</label>
+        <div class="field"><label for="fTier">Pinakamababang tier</label>
           <select id="fTier">
             <option value="free">Free — lahat makakakita</option>
             <option value="premium">Premium</option>
@@ -137,7 +137,7 @@
         </label>
       </div>
       <div class="modal-foot">
-        <button type="button" class="btn ghost" id="mCancel">Cancel</button>
+        <button type="button" class="btn ghost" id="mCancel">Kanselahin</button>
         <button type="submit" class="btn" id="mSave">I-save</button>
       </div>
     </form>
@@ -267,8 +267,8 @@ async function loadPayments(){
       '<td><span class="st st-' + p.status + '">' + p.status + "</span>" +
         (p.admin_note ? "<br><small style='color:var(--muted)'>" + esc(p.admin_note) + "</small>" : "") + "</td>" +
       '<td class="actions">' + (p.status === "pending"
-        ? '<button class="btn ok sm" data-ok="' + p.id + '">Approve</button>' +
-          '<button class="btn bad sm" data-no="' + p.id + '">Reject</button>'
+        ? '<button class="btn ok sm" data-ok="' + p.id + '">Aprubahan</button>' +
+          '<button class="btn bad sm" data-no="' + p.id + '">Tanggihan</button>'
         : "") + "</td></tr>";
   }).join("");
 
@@ -451,7 +451,7 @@ function renderMembers(){
     "<td>" + m.downloads + "</td>" +
     "<td>" + fmt(m.created_at) + "</td>" +
     "<td>" + (m.expires_at ? fmt(m.expires_at) : "<span style='color:var(--muted)'>walang expiry</span>") + "</td>" +
-    '<td class="actions"><button class="btn ghost sm" data-exp="' + m.id + '">Set expiry</button></td></tr>').join("");
+    '<td class="actions"><button class="btn ghost sm" data-exp="' + m.id + '">Itakda ang expiry</button></td></tr>').join("");
 
   $("memBody").querySelectorAll("[data-tier]").forEach(s => {
     s.onchange = async () => {

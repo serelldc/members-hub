@@ -72,7 +72,7 @@
     <div id="payStatus" class="msg hide"></div>
 
     <div class="stats">
-      <div class="stat"><div class="n" id="sTotal">0</div><div class="l">Available</div></div>
+      <div class="stat"><div class="n" id="sTotal">0</div><div class="l">Meron ngayon</div></div>
       <div class="stat"><div class="n" id="sNew">0</div><div class="l">Bago ngayong buwan</div></div>
       <div class="stat"><div class="n" id="sCat">0</div><div class="l">Kategorya</div></div>
       <div class="stat"><div class="n" id="sDl">0</div><div class="l">Na-download mo</div></div>
@@ -115,7 +115,7 @@
           <li>Ipadala ang eksaktong halaga ng plan na gusto mo.</li>
           <li>I-screenshot ang <b>receipt</b> (dapat kita ang reference number).</li>
           <li>Punan ang form sa baba at i-submit ang screenshot.</li>
-          <li>Ia-approve ko ito — karaniwang <b>within 24 hours</b>. May email ka kapag active na.</li>
+          <li>Ia-approve ko ito — karaniwang <b>sa loob ng 24 oras</b>. May email ka kapag active na.</li>
         </ol>
 
         <div id="payMsg" class="msg hide"></div>
@@ -149,7 +149,7 @@
   <footer>
     <img class="flogo" src="logo.png" alt="">
     <div id="footTxt"></div>
-    <div style="margin-top:8px;opacity:.65">May tanong? <a id="supportLink" href="#">Contact support</a></div>
+    <div style="margin-top:8px;opacity:.65">May tanong? <a id="supportLink" href="#">Makipag-ugnayan sa amin</a></div>
   </footer>
 </div>
 
@@ -385,11 +385,19 @@ function render(){
 
   $("grid").innerHTML = list.map(p => {
     const isNew = new Date(p.created_at) > monthAgo;
-    const img = /^https?:\/\//.test(p.cover || "");
-    const style = img ? "background-image:url(" + esc(p.cover) + ")" : "";
-    const coverInner = img ? "" :
-      '<span class="mono">' + esc(initials(p.title)) + '</span>' +
-      '<span class="kind-tag">' + esc(p.kind) + '</span>';
+    // Sariling cover ng product muna; kung wala, larawan ng kategorya
+    // (config.js → categoryImages); kung wala rin iyon, monogram tile.
+    const ownImg = /^https?:\/\//.test(p.cover || "");
+    const catImg = !ownImg && C.categoryImages && C.categoryImages[p.category];
+    const bgUrl = ownImg ? p.cover : (catImg || "");
+    const hasImg = !!bgUrl;
+    const style = hasImg
+      ? "background-image:linear-gradient(to top, rgba(5,6,8,.65), rgba(5,6,8,0) 55%), url(" + esc(bgUrl) + ")"
+      : "";
+    const coverInner = hasImg
+      ? '<span class="kind-tag">' + esc(p.kind) + '</span>'
+      : '<span class="mono">' + esc(initials(p.title)) + '</span>' +
+        '<span class="kind-tag">' + esc(p.kind) + '</span>';
     return '<article class="card">' +
       '<div class="cover" style="' + style + '">' + coverInner +
         (isNew ? '<span class="tag new">Bago</span>' : "") +
@@ -488,7 +496,7 @@ async function loadPayStatus(){
   if (!r) return;
   if (r.status === "pending")
     showMsg("payStatus", "<b>Nasa review ang bayad mo.</b> Nakatanggap kami ng request para sa <b>" +
-      esc(r.requested_tier.toUpperCase()) + "</b>. Ia-approve ko ito within 24 hours.", "warn");
+      esc(r.requested_tier.toUpperCase()) + "</b>. Ia-approve ko ito sa loob ng 24 oras.", "warn");
   else if (r.status === "rejected")
     showMsg("payStatus", "<b>Hindi na-approve ang huling submission mo.</b>" +
       (r.admin_note ? " Dahilan: " + esc(r.admin_note) : "") +
@@ -524,7 +532,7 @@ $("payForm").addEventListener("submit", async e => {
     if (insErr) throw insErr;
 
     showMsg("payMsg", "<b>Nasumite na!</b> Iri-review ko ang bayad mo at ia-activate ang account " +
-      "within 24 hours. May makikita kang update dito pagbalik mo.", "ok");
+      "sa loob ng 24 oras. May makikita kang update dito pagbalik mo.", "ok");
     $("payForm").reset();
   } catch(err) {
     showMsg("payMsg", esc(err.message || "May nangyaring mali."), "err");
