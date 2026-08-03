@@ -10,8 +10,8 @@ window.CFG = {
      ⚠️ Ang "anon public" key LANG ang ilalagay dito — hindi ang
         service_role key. Ligtas ang anon key na makita ng publiko
         dahil protektado ng Row Level Security ang data mo.        */
-  SUPABASE_URL:      "https://YOUR-PROJECT-REF.supabase.co",
-  SUPABASE_ANON_KEY: "PASTE-YOUR-ANON-PUBLIC-KEY-HERE",
+  SUPABASE_URL:      "https://bvklzienfqwyzcwnvusb.supabase.co",
+  SUPABASE_ANON_KEY: "sb_publishable_Ldp9KQGQBGCNvhU-M7yZgA_CRfwSR-i",
 
 
   /* ── 2. BRANDING ──────────────────────────────────────────────── */
