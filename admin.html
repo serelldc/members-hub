@@ -11,7 +11,7 @@
 
 <div id="gate" class="auth-wrap hide">
   <div class="auth-box">
-    <div class="brand-mark">🔐</div>
+    <div class="brand-mark"><img src="logo.png" alt=""></div>
     <h1>Admin Panel</h1>
     <p class="sub" id="gateSub">Mag-login gamit ang admin account mo.</p>
     <div id="gateMsg" class="msg hide"></div>
@@ -30,10 +30,10 @@
 <div id="app" class="hide">
   <header class="topbar">
     <div class="topbar-in">
-      <a class="logo" href="index.html"><span class="dot">⚙</span><span>Admin Panel</span></a>
+      <a class="logo" href="index.html"><img src="logo.png" alt=""><span class="logo-tag">Admin</span></a>
       <div class="spacer"></div>
-      <a href="index.html" class="btn ghost sm">Members view</a>
-      <button class="btn ghost sm" id="out">Logout</button>
+      <a href="index.html" class="btn ghost sm">Tingnan bilang member</a>
+      <button class="btn ghost sm" id="out">Mag-logout</button>
     </div>
   </header>
 
@@ -46,9 +46,9 @@
     </div>
 
     <div class="chips" style="margin-bottom:20px">
-      <button class="chip on" data-tab="pay">💰 Bayad</button>
-      <button class="chip" data-tab="prod">📦 Products</button>
-      <button class="chip" data-tab="mem">👥 Members</button>
+      <button class="chip on" data-tab="pay">Bayad</button>
+      <button class="chip" data-tab="prod">Products</button>
+      <button class="chip" data-tab="mem">Members</button>
     </div>
 
     <!-- ══ PAYMENTS ══ -->
@@ -78,7 +78,7 @@
     <!-- ══ MEMBERS ══ -->
     <section id="tab-mem" class="hide">
       <div class="toolbar" style="margin-bottom:14px">
-        <div class="search"><span class="ic">🔍</span>
+        <div class="search"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           <input type="search" id="memQ" placeholder="Hanapin ang member..."></div>
       </div>
       <div id="memMsg" class="msg hide"></div>
@@ -118,8 +118,8 @@
         <div class="field"><label for="fSize">File size (display)</label>
           <input type="text" id="fSize" placeholder="2.4 MB"></div>
       </div>
-      <div class="field"><label for="fCover">Cover — emoji o image URL</label>
-        <input type="text" id="fCover" placeholder="📦"></div>
+      <div class="field"><label for="fCover">Cover image URL (opsyonal)</label>
+        <input type="text" id="fCover" placeholder="https://... — kung wala, monogram tile ang gagamitin"></div>
 
       <div class="field">
         <label for="fFile">I-upload ang file (secure — Supabase Storage)</label>
@@ -154,6 +154,12 @@ const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;")
   .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 const fmt = d => d ? new Date(d).toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"}) : "—";
 const peso = n => n == null ? "—" : "₱" + Number(n).toLocaleString("en-PH",{minimumFractionDigits:2});
+function initials(title){
+  const words = String(title || "").trim().split(/\s+/).filter(Boolean);
+  if (!words.length) return "•";
+  if (words.length === 1) return words[0].slice(0,2).toUpperCase();
+  return (words[0][0] + words[1][0]).toUpperCase();
+}
 
 if (C.SUPABASE_URL.includes("YOUR-PROJECT-REF")) {
   document.body.innerHTML = '<div class="auth-wrap"><div class="auth-box"><div class="msg err">' +
@@ -279,7 +285,7 @@ async function loadPayments(){
       b.disabled = true;
       const { error } = await sb.rpc("approve_payment", { req_id: b.dataset.ok, note: null });
       if (error) { msg("payMsg", esc(error.message)); b.disabled = false; return; }
-      msg("payMsg", "✅ Na-approve! Na-upgrade na ang tier ng member.", "ok");
+      msg("payMsg", "Na-approve! Na-upgrade na ang tier ng member.", "ok");
       await loadMembers(); loadPayments();
     };
   });
@@ -310,16 +316,22 @@ async function loadProducts(){
   }
   $("prodBody").innerHTML = prods.map(p => {
     const img = /^https?:\/\//.test(p.cover || "");
+    const thumb = img
+      ? '<img src="' + esc(p.cover) + '" style="width:34px;height:34px;object-fit:cover;border-radius:7px">'
+      : '<span class="mini-mono">' + esc(initials(p.title)) + '</span>';
+    const src = p.storage_path
+      ? '<span class="src on">Storage</span>'
+      : p.external_url ? '<span class="src on">Link</span>' : '<span class="src off">Wala</span>';
+    const live = p.published ? '<span class="live-dot on">Live</span>' : '<span class="live-dot">Naka-hide</span>';
     return "<tr>" +
-      '<td style="font-size:22px;width:44px">' + (img ? '<img src="' + esc(p.cover) +
-        '" style="width:34px;height:34px;object-fit:cover;border-radius:7px">' : esc(p.cover || "📦")) + "</td>" +
+      '<td style="width:44px">' + thumb + "</td>" +
       "<td><b>" + esc(p.title) + "</b>" + (p.file_size ? "<br><small style='color:var(--muted)'>" + esc(p.file_size) + "</small>" : "") + "</td>" +
       "<td>" + esc(p.category) + "</td><td>" + esc(p.kind) + "</td>" +
       '<td><span class="tier-badge tier-' + p.tier + '">' + esc(p.tier) + "</span></td>" +
-      "<td>" + (p.storage_path ? "🔒 Storage" : p.external_url ? "🔗 Link" : "<span style='color:var(--danger)'>⚠ Wala</span>") + "</td>" +
-      "<td>" + (p.published ? "✅" : "⏸") + "</td>" +
-      '<td class="actions"><button class="btn ghost sm" data-edit="' + p.id + '">Edit</button>' +
-        '<button class="btn bad sm" data-del="' + p.id + '">Delete</button></td></tr>';
+      "<td>" + src + "</td>" +
+      "<td>" + live + "</td>" +
+      '<td class="actions"><button class="btn ghost sm" data-edit="' + p.id + '">I-edit</button>' +
+        '<button class="btn bad sm" data-del="' + p.id + '">Burahin</button></td></tr>';
   }).join("");
 
   $("prodBody").querySelectorAll("[data-edit]").forEach(b => { b.onclick = () => openModal(b.dataset.edit); });
@@ -350,7 +362,7 @@ function openModal(id){
   $("fKind").value  = p?.kind || "PDF";
   $("fTier").value  = p?.tier || "free";
   $("fSize").value  = p?.file_size || "";
-  $("fCover").value = p?.cover || "📦";
+  $("fCover").value = p?.cover || "";
   $("fUrl").value   = p?.external_url || "";
   $("fPub").checked = p ? p.published : true;
   $("fFile").value  = "";
@@ -375,7 +387,7 @@ $("prodForm").addEventListener("submit", async e => {
       kind: $("fKind").value.trim() || "PDF",
       tier: $("fTier").value,
       file_size: $("fSize").value.trim() || null,
-      cover: $("fCover").value.trim() || "📦",
+      cover: $("fCover").value.trim() || null,
       external_url: $("fUrl").value.trim() || null,
       published: $("fPub").checked
     };
@@ -399,7 +411,7 @@ $("prodForm").addEventListener("submit", async e => {
     if (error) throw error;
 
     $("modal").classList.add("hide");
-    msg("prodMsg", "✅ Na-save ang product.", "ok");
+    msg("prodMsg", "Na-save ang product.", "ok");
     loadProducts();
   } catch(err) {
     msg("mMsg", esc(err.message || "May nangyaring mali."));
@@ -447,7 +459,7 @@ function renderMembers(){
       const { error } = await sb.rpc("set_member_tier",
         { target: m.id, new_tier: s.value, until: m.expires_at });
       if (error) { msg("memMsg", esc(error.message)); s.value = m.tier; return; }
-      msg("memMsg", "✅ Na-update ang tier ni " + esc(m.full_name || m.email) + " → " + s.value, "ok");
+      msg("memMsg", "Na-update ang tier ni " + esc(m.full_name || m.email) + " → " + s.value, "ok");
       loadMembers();
     };
   });
@@ -460,7 +472,7 @@ function renderMembers(){
       const until = v.trim() ? new Date(v.trim() + "T23:59:59").toISOString() : null;
       const { error } = await sb.rpc("set_member_tier", { target: m.id, new_tier: m.tier, until });
       if (error) return msg("memMsg", esc(error.message));
-      msg("memMsg", "✅ Na-update ang expiry.", "ok");
+      msg("memMsg", "Na-update ang expiry.", "ok");
       loadMembers();
     };
   });
