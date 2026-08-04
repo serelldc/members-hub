@@ -26,7 +26,7 @@ svg{display:block}
 .auth-wrap{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 .auth-box{width:100%;max-width:410px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:36px 30px;box-shadow:0 30px 70px rgba(0,0,0,.5)}
 .brand-mark{display:flex;justify-content:center;margin-bottom:24px}
-.brand-mark img{height:38px;width:auto;display:block}
+.brand-mark img{height:68px;width:auto;display:block}
 .auth-box h1{font-size:20px;font-weight:700;text-align:center;margin-bottom:6px;letter-spacing:-.3px}
 .auth-box .sub{text-align:center;color:var(--muted);font-size:13.5px;margin-bottom:26px;line-height:1.5}
 .tabs{display:flex;gap:4px;background:var(--bg2);padding:4px;border-radius:9px;margin-bottom:22px;border:1px solid var(--line)}
@@ -66,7 +66,7 @@ svg{display:block}
 .topbar{position:sticky;top:0;z-index:50;background:rgba(10,10,12,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
 .topbar-in{max-width:1180px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--txt)}
-.logo img{height:26px;width:auto;display:block}
+.logo img{height:34px;width:auto;display:block}
 .logo-tag{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:3px 7px}
 .spacer{flex:1}
 .who{display:flex;align-items:center;gap:9px;font-size:13.5px}
@@ -176,7 +176,7 @@ td.actions{white-space:nowrap;display:flex;gap:6px}
 
 footer{border-top:1px solid var(--line);margin-top:56px;padding:24px 22px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.8;position:relative;z-index:1}
 footer a{text-decoration:none}
-footer .flogo{height:16px;width:auto;opacity:.5;margin-bottom:10px}
+footer .flogo{height:22px;width:auto;opacity:.5;margin-bottom:10px}
 
 @media(max-width:720px){
   .stats{grid-template-columns:repeat(2,1fr)}

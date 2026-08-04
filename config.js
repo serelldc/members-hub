@@ -15,8 +15,8 @@ window.CFG = {
 
 
   /* ── 2. BRANDING ──────────────────────────────────────────────── */
-  brandName: "SRDC Members Hub",
-  initial:   "S",
+  brandName: "Digz Members",
+  initial:   "D",
   tagline:   "Lahat ng digital products mo, nasa isang lugar.",
 
   /* Banner sa dashboard. Gawing "" para itago. Pwede ang HTML. */
