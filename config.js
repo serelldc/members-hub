@@ -17,10 +17,10 @@ window.CFG = {
   /* ── 2. BRANDING ──────────────────────────────────────────────── */
   brandName: "Digz Members",
   initial:   "D",
-  tagline:   "Lahat ng digital products mo, nasa isang lugar.",
+  tagline:   "All your digital products, in one place.",
 
-  /* Banner sa dashboard. Gawing "" para itago. Pwede ang HTML. */
-  announcement: "<b>Bago!</b> May bagong templates ngayong buwan — scroll down para makita.",
+  /* Banner on the dashboard. Set to "" to hide it. HTML is allowed. */
+  announcement: "<b>New!</b> New templates added this month — scroll down to see.",
 
   supportEmail: "strategicresource.dc@gmail.com",
 
@@ -51,10 +51,10 @@ window.CFG = {
      dito — handa na ang database at ang site para dito. */
   pricing: {
     premium: { price: 2500, label: "All-Access Membership", perks: [
-      "Lahat ng digital products — walang exception",
-      "Lahat ng future releases, libre habambuhay",
-      "Templates, guides, at trainings",
-      "Instant download anytime, kahit ilang beses",
+      "Every digital product — no exceptions",
+      "All future releases, free forever",
+      "Templates, guides, and trainings",
+      "Instant download anytime, as many times as you like",
       "Priority support via email"
     ]}
   },
