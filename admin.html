@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="tl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Admin — Digz Members</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 
@@ -13,17 +13,17 @@
   <div class="auth-box">
     <div class="brand-mark"><img src="brand-logo.png" alt=""></div>
     <h1>Admin Panel</h1>
-    <p class="sub" id="gateSub">Mag-login gamit ang admin account mo.</p>
+    <p class="sub" id="gateSub">Log in with your admin account.</p>
     <div id="gateMsg" class="msg hide"></div>
     <form id="gateForm">
       <div class="field"><label for="em">Email</label>
         <input type="email" id="em" autocomplete="username" required></div>
       <div class="field"><label for="pw">Password</label>
         <input type="password" id="pw" autocomplete="current-password" required></div>
-      <button type="submit" class="btn full" id="gateBtn">Mag-login</button>
+      <button type="submit" class="btn full" id="gateBtn">Log In</button>
     </form>
     <p style="text-align:center;margin-top:16px;font-size:13px">
-      <a href="index.html" style="color:var(--muted);text-decoration:none">← Balik sa Digz Members</a></p>
+      <a href="index.html" style="color:var(--muted);text-decoration:none">← Back to Digz Members</a></p>
   </div>
 </div>
 
@@ -32,21 +32,21 @@
     <div class="topbar-in">
       <a class="logo" href="index.html"><img src="brand-logo.png" alt=""><span class="logo-tag">Admin</span></a>
       <div class="spacer"></div>
-      <a href="index.html" class="btn ghost sm">Tingnan bilang member</a>
-      <button class="btn ghost sm" id="out">Mag-logout</button>
+      <a href="index.html" class="btn ghost sm">View as Member</a>
+      <button class="btn ghost sm" id="out">Log Out</button>
     </div>
   </header>
 
   <main>
     <div class="stats">
-      <div class="stat"><div class="n" id="kPending">0</div><div class="l">Naghihintay ng approval</div></div>
-      <div class="stat"><div class="n" id="kMembers">0</div><div class="l">Kabuuang members</div></div>
-      <div class="stat"><div class="n" id="kPaid">0</div><div class="l">May bayad na members</div></div>
-      <div class="stat"><div class="n" id="kProducts">0</div><div class="l">Mga product</div></div>
+      <div class="stat"><div class="n" id="kPending">0</div><div class="l">Pending Approval</div></div>
+      <div class="stat"><div class="n" id="kMembers">0</div><div class="l">Total Members</div></div>
+      <div class="stat"><div class="n" id="kPaid">0</div><div class="l">Paying Members</div></div>
+      <div class="stat"><div class="n" id="kProducts">0</div><div class="l">Products</div></div>
     </div>
 
     <div class="chips" style="margin-bottom:20px">
-      <button class="chip on" data-tab="pay">Bayad</button>
+      <button class="chip on" data-tab="pay">Payments</button>
       <button class="chip" data-tab="prod">Products</button>
       <button class="chip" data-tab="mem">Members</button>
     </div>
@@ -55,23 +55,23 @@
     <section id="tab-pay">
       <div id="payMsg" class="msg hide"></div>
       <div class="tblwrap"><table>
-        <thead><tr><th>Petsa</th><th>Member</th><th>Plan</th><th>Halaga</th>
-          <th>Reference</th><th>Patunay</th><th>Status</th><th></th></tr></thead>
-        <tbody id="payBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Nilo-load...</td></tr></tbody>
+        <thead><tr><th>Date</th><th>Member</th><th>Plan</th><th>Amount</th>
+          <th>Reference</th><th>Proof</th><th>Status</th><th></th></tr></thead>
+        <tbody id="payBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
       </table></div>
     </section>
 
     <!-- ══ PRODUCTS ══ -->
     <section id="tab-prod" class="hide">
       <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
-        <button class="btn" id="newProd">+ Bagong product</button>
+        <button class="btn" id="newProd">+ New Product</button>
         <div class="spacer"></div>
       </div>
       <div id="prodMsg" class="msg hide"></div>
       <div class="tblwrap"><table>
-        <thead><tr><th></th><th>Pamagat</th><th>Kategorya</th><th>Uri</th>
+        <thead><tr><th></th><th>Title</th><th>Category</th><th>Type</th>
           <th>Tier</th><th>Source</th><th>Live</th><th></th></tr></thead>
-        <tbody id="prodBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Nilo-load...</td></tr></tbody>
+        <tbody id="prodBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
       </table></div>
     </section>
 
@@ -79,13 +79,13 @@
     <section id="tab-mem" class="hide">
       <div class="toolbar" style="margin-bottom:14px">
         <div class="search"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-          <input type="search" id="memQ" placeholder="Hanapin ang member..."></div>
+          <input type="search" id="memQ" placeholder="Search members..."></div>
       </div>
       <div id="memMsg" class="msg hide"></div>
       <div class="tblwrap"><table>
-        <thead><tr><th>Pangalan</th><th>Email</th><th>Tier</th><th>Downloads</th>
-          <th>Sumali</th><th>Mag-e-expire</th><th></th></tr></thead>
-        <tbody id="memBody"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px">Nilo-load...</td></tr></tbody>
+        <thead><tr><th>Name</th><th>Email</th><th>Tier</th><th>Downloads</th>
+          <th>Joined</th><th>Expires</th><th></th></tr></thead>
+        <tbody id="memBody"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
       </table></div>
     </section>
   </main>
@@ -94,57 +94,57 @@
 <!-- ══ PRODUCT MODAL ══ -->
 <div id="modal" class="modal hide">
   <div class="modal-box">
-    <h3 id="mTitle">Bagong product</h3>
+    <h3 id="mTitle">New Product</h3>
     <div id="mMsg" class="msg hide"></div>
     <form id="prodForm">
       <input type="hidden" id="fId">
-      <div class="field"><label for="fTitle">Pamagat</label>
+      <div class="field"><label for="fTitle">Title</label>
         <input type="text" id="fTitle" required></div>
-      <div class="field"><label for="fDesc">Deskripsyon</label>
-        <textarea id="fDesc" placeholder="1–2 pangungusap tungkol sa product."></textarea></div>
+      <div class="field"><label for="fDesc">Description</label>
+        <textarea id="fDesc" placeholder="1–2 sentences about the product."></textarea></div>
       <div class="row2">
-        <div class="field"><label for="fCat">Kategorya</label>
+        <div class="field"><label for="fCat">Category</label>
           <input type="text" id="fCat" placeholder="Templates" required></div>
-        <div class="field"><label for="fKind">Uri</label>
+        <div class="field"><label for="fKind">Type</label>
           <input type="text" id="fKind" placeholder="PDF" required></div>
       </div>
       <div class="row2">
-        <div class="field"><label for="fTier">Pinakamababang tier</label>
+        <div class="field"><label for="fTier">Minimum Tier</label>
           <select id="fTier">
-            <option value="free">Free — lahat makakakita</option>
+            <option value="free">Free — everyone can see</option>
             <option value="premium">Premium</option>
             <option value="vip">VIP</option>
           </select></div>
-        <div class="field"><label for="fSize">File size (display)</label>
+        <div class="field"><label for="fSize">File Size (display)</label>
           <input type="text" id="fSize" placeholder="2.4 MB"></div>
       </div>
-      <div class="field"><label for="fCover">Cover image URL (opsyonal)</label>
-        <input type="text" id="fCover" placeholder="https://... — kung wala, monogram tile ang gagamitin"></div>
+      <div class="field"><label for="fCover">Cover Image URL (optional)</label>
+        <input type="text" id="fCover" placeholder="https://... — leave blank to use a monogram tile"></div>
 
       <div class="field">
-        <label for="fFile">I-upload ang file (secure — Supabase Storage)</label>
+        <label for="fFile">Upload File (secure — Supabase Storage)</label>
         <input type="file" id="fFile">
-        <div class="hint" id="curFile">Para sa PDF, template, at maliliit na file. Signed link na nag-e-expire ang makukuha ng member.</div>
+        <div class="hint" id="curFile">For PDFs, templates, and small files. Members get an expiring signed link.</div>
       </div>
       <div class="field">
-        <label for="fUrl">…O Google Drive link (para sa malalaking video)</label>
+        <label for="fUrl">…Or a Google Drive link (for large videos)</label>
         <input type="url" id="fUrl" placeholder="https://drive.google.com/...">
-        <div class="hint">Kung may na-upload kang file sa taas, iyon ang gagamitin. Isa lang ang kailangan.</div>
+        <div class="hint">If you've uploaded a file above, that will be used instead. Only one is needed.</div>
       </div>
       <div class="field">
         <label style="display:flex;align-items:center;gap:9px;text-transform:none;font-size:14px;color:var(--txt)">
-          <input type="checkbox" id="fPub" checked style="width:auto;margin:0"> Live (nakikita ng members)
+          <input type="checkbox" id="fPub" checked style="width:auto;margin:0"> Live (visible to members)
         </label>
       </div>
       <div class="modal-foot">
-        <button type="button" class="btn ghost" id="mCancel">Kanselahin</button>
-        <button type="submit" class="btn" id="mSave">I-save</button>
+        <button type="button" class="btn ghost" id="mCancel">Cancel</button>
+        <button type="submit" class="btn" id="mSave">Save</button>
       </div>
     </form>
   </div>
 </div>
 
-<script src="config.js"></script>
+<script src="config.js?v=3"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -163,7 +163,7 @@ function initials(title){
 
 if (C.SUPABASE_URL.includes("YOUR-PROJECT-REF")) {
   document.body.innerHTML = '<div class="auth-wrap"><div class="auth-box"><div class="msg err">' +
-    "<b>Hindi pa naka-setup.</b><br><br>Punan muna ang <code>config.js</code>.</div></div></div>";
+    "<b>Not set up yet.</b><br><br>Fill in <code>config.js</code> first.</div></div></div>";
   throw new Error("config not set");
 }
 const sb = createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY);
@@ -182,7 +182,7 @@ $("gateForm").addEventListener("submit", async e => {
   const { error } = await sb.auth.signInWithPassword({
     email: $("em").value.trim().toLowerCase(), password: $("pw").value });
   $("gateBtn").disabled = false;
-  if (error) msg("gateMsg", "Mali ang email o password.");
+  if (error) msg("gateMsg", "Incorrect email or password.");
 });
 $("out").onclick = async () => { await sb.auth.signOut(); location.reload(); };
 
@@ -199,12 +199,12 @@ async function init(){
 
   if (error) {
     $("gate").classList.remove("hide");
-    msg("gateMsg", "Hindi ma-load ang profile: " + esc(error.message));
+    msg("gateMsg", "Could not load profile: " + esc(error.message));
     return;
   }
   if (!prof?.is_admin) {
     $("gate").classList.remove("hide");
-    msg("gateMsg", "Hindi admin ang account na ito.<br><br>Sa Supabase SQL Editor, i-run:<br>" +
+    msg("gateMsg", "This account is not an admin.<br><br>In the Supabase SQL Editor, run:<br>" +
       "<code style='display:block;margin-top:8px;font-size:11.5px;line-height:1.6'>update public.profiles set is_admin=true, tier='vip' where email='" +
       esc(session.user.email) + "';</code>");
     await sb.auth.signOut();
@@ -217,8 +217,8 @@ async function init(){
   loadAll();
 }
 
-// Huwag mag-reload dito — pinaputok ng Supabase ang SIGNED_IN sa bawat
-// page load at token refresh, kaya magiging infinite reload loop iyon.
+// Don't reload here — Supabase fires SIGNED_IN on every page load and
+// token refresh, which would create an infinite reload loop.
 sb.auth.onAuthStateChange((e) => {
   if (e === "SIGNED_OUT") location.reload();
   else init();
@@ -236,7 +236,7 @@ document.querySelectorAll("[data-tab]").forEach(b => {
 });
 
 async function loadAll(){
-  // Members muna — kailangan ng payments table ang pangalan/email nila.
+  // Members first — the payments table needs their name/email.
   await loadMembers();
   await Promise.all([loadPayments(), loadProducts()]);
 }
@@ -250,7 +250,7 @@ async function loadPayments(){
   $("kPending").textContent = payments.filter(p => p.status === "pending").length;
 
   if (!payments.length) {
-    $("payBody").innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:36px">Wala pang payment request.</td></tr>';
+    $("payBody").innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:36px">No payment requests yet.</td></tr>';
     return;
   }
 
@@ -263,40 +263,40 @@ async function loadPayments(){
       '<td><span class="tier-badge tier-' + p.requested_tier + '">' + esc(p.requested_tier) + "</span></td>" +
       "<td>" + peso(p.amount) + "</td>" +
       "<td><code style='font-size:12px'>" + esc(p.reference || "—") + "</code></td>" +
-      "<td>" + (p.proof_path ? '<button class="btn ghost sm" data-proof="' + esc(p.proof_path) + '">Tingnan</button>' : "—") + "</td>" +
+      "<td>" + (p.proof_path ? '<button class="btn ghost sm" data-proof="' + esc(p.proof_path) + '">View</button>' : "—") + "</td>" +
       '<td><span class="st st-' + p.status + '">' + p.status + "</span>" +
         (p.admin_note ? "<br><small style='color:var(--muted)'>" + esc(p.admin_note) + "</small>" : "") + "</td>" +
       '<td class="actions">' + (p.status === "pending"
-        ? '<button class="btn ok sm" data-ok="' + p.id + '">Aprubahan</button>' +
-          '<button class="btn bad sm" data-no="' + p.id + '">Tanggihan</button>'
+        ? '<button class="btn ok sm" data-ok="' + p.id + '">Approve</button>' +
+          '<button class="btn bad sm" data-no="' + p.id + '">Reject</button>'
         : "") + "</td></tr>";
   }).join("");
 
   $("payBody").querySelectorAll("[data-proof]").forEach(b => {
     b.onclick = async () => {
       const { data, error } = await sb.storage.from("proofs").createSignedUrl(b.dataset.proof, 600);
-      if (error) return alert("Hindi mabuksan: " + error.message);
+      if (error) return alert("Could not open: " + error.message);
       window.open(data.signedUrl, "_blank", "noopener");
     };
   });
   $("payBody").querySelectorAll("[data-ok]").forEach(b => {
     b.onclick = async () => {
-      if (!confirm("I-approve at i-upgrade ang member na ito?")) return;
+      if (!confirm("Approve and upgrade this member?")) return;
       b.disabled = true;
       const { error } = await sb.rpc("approve_payment", { req_id: b.dataset.ok, note: null });
       if (error) { msg("payMsg", esc(error.message)); b.disabled = false; return; }
-      msg("payMsg", "Na-approve! Na-upgrade na ang tier ng member.", "ok");
+      msg("payMsg", "Approved! The member's tier has been upgraded.", "ok");
       await loadMembers(); loadPayments();
     };
   });
   $("payBody").querySelectorAll("[data-no]").forEach(b => {
     b.onclick = async () => {
-      const note = prompt("Dahilan ng pag-reject (makikita ng member):", "Hindi tugma ang reference number.");
+      const note = prompt("Reason for rejecting (the member will see this):", "Reference number doesn't match.");
       if (note === null) return;
       b.disabled = true;
       const { error } = await sb.rpc("reject_payment", { req_id: b.dataset.no, note });
       if (error) { msg("payMsg", esc(error.message)); b.disabled = false; return; }
-      msg("payMsg", "Na-reject ang request.", "ok");
+      msg("payMsg", "Request rejected.", "ok");
       loadPayments();
     };
   });
@@ -311,7 +311,7 @@ async function loadProducts(){
   $("kProducts").textContent = prods.length;
 
   if (!prods.length) {
-    $("prodBody").innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:36px">Wala pang products. I-click ang “+ Bagong product”.</td></tr>';
+    $("prodBody").innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:36px">No products yet. Click “+ New Product”.</td></tr>';
     return;
   }
   $("prodBody").innerHTML = prods.map(p => {
@@ -321,8 +321,8 @@ async function loadProducts(){
       : '<span class="mini-mono">' + esc(initials(p.title)) + '</span>';
     const src = p.storage_path
       ? '<span class="src on">Storage</span>'
-      : p.external_url ? '<span class="src on">Link</span>' : '<span class="src off">Wala</span>';
-    const live = p.published ? '<span class="live-dot on">Live</span>' : '<span class="live-dot">Naka-hide</span>';
+      : p.external_url ? '<span class="src on">Link</span>' : '<span class="src off">None</span>';
+    const live = p.published ? '<span class="live-dot on">Live</span>' : '<span class="live-dot">Hidden</span>';
     return "<tr>" +
       '<td style="width:44px">' + thumb + "</td>" +
       "<td><b>" + esc(p.title) + "</b>" + (p.file_size ? "<br><small style='color:var(--muted)'>" + esc(p.file_size) + "</small>" : "") + "</td>" +
@@ -330,19 +330,19 @@ async function loadProducts(){
       '<td><span class="tier-badge tier-' + p.tier + '">' + esc(p.tier) + "</span></td>" +
       "<td>" + src + "</td>" +
       "<td>" + live + "</td>" +
-      '<td class="actions"><button class="btn ghost sm" data-edit="' + p.id + '">I-edit</button>' +
-        '<button class="btn bad sm" data-del="' + p.id + '">Burahin</button></td></tr>';
+      '<td class="actions"><button class="btn ghost sm" data-edit="' + p.id + '">Edit</button>' +
+        '<button class="btn bad sm" data-del="' + p.id + '">Delete</button></td></tr>';
   }).join("");
 
   $("prodBody").querySelectorAll("[data-edit]").forEach(b => { b.onclick = () => openModal(b.dataset.edit); });
   $("prodBody").querySelectorAll("[data-del]").forEach(b => {
     b.onclick = async () => {
       const p = prods.find(x => x.id === b.dataset.del);
-      if (!confirm('Burahin ang "' + p.title + '"? Hindi na ito maibabalik.')) return;
+      if (!confirm('Delete "' + p.title + '"? This cannot be undone.')) return;
       if (p.storage_path) await sb.storage.from("products").remove([p.storage_path]);
       const { error } = await sb.from("products").delete().eq("id", p.id);
       if (error) return msg("prodMsg", esc(error.message));
-      msg("prodMsg", "Nabura ang product.", "ok");
+      msg("prodMsg", "Product deleted.", "ok");
       loadProducts();
     };
   });
@@ -354,7 +354,7 @@ $("modal").onclick = e => { if (e.target.id === "modal") $("modal").classList.ad
 
 function openModal(id){
   const p = id ? prods.find(x => x.id === id) : null;
-  $("mTitle").textContent = p ? "I-edit ang product" : "Bagong product";
+  $("mTitle").textContent = p ? "Edit Product" : "New Product";
   $("fId").value    = p?.id || "";
   $("fTitle").value = p?.title || "";
   $("fDesc").value  = p?.description || "";
@@ -367,8 +367,8 @@ function openModal(id){
   $("fPub").checked = p ? p.published : true;
   $("fFile").value  = "";
   $("curFile").innerHTML = p?.storage_path
-    ? "Kasalukuyang file: <b>" + esc(p.storage_path.split("/").pop()) + "</b> — mag-upload lang kung papalitan mo."
-    : "Para sa PDF, template, at maliliit na file. Signed link na nag-e-expire ang makukuha ng member.";
+    ? "Current file: <b>" + esc(p.storage_path.split("/").pop()) + "</b> — only upload if replacing it."
+    : "For PDFs, templates, and small files. Members get an expiring signed link.";
   $("mMsg").classList.add("hide");
   $("modal").classList.remove("hide");
 }
@@ -377,7 +377,7 @@ $("prodForm").addEventListener("submit", async e => {
   e.preventDefault();
   const btn = $("mSave");
   btn.disabled = true;
-  btn.textContent = "Ini-save...";
+  btn.textContent = "Saving...";
   try {
     const id = $("fId").value;
     const rec = {
@@ -394,7 +394,7 @@ $("prodForm").addEventListener("submit", async e => {
 
     const file = $("fFile").files[0];
     if (file) {
-      btn.textContent = "Ini-upload ang file...";
+      btn.textContent = "Uploading file...";
       const safe = file.name.replace(/[^\w.\-]+/g, "_");
       const path = Date.now() + "_" + safe;
       const { error:upErr } = await sb.storage.from("products").upload(path, file, { upsert:false });
@@ -411,13 +411,13 @@ $("prodForm").addEventListener("submit", async e => {
     if (error) throw error;
 
     $("modal").classList.add("hide");
-    msg("prodMsg", "Na-save ang product.", "ok");
+    msg("prodMsg", "Product saved.", "ok");
     loadProducts();
   } catch(err) {
-    msg("mMsg", esc(err.message || "May nangyaring mali."));
+    msg("mMsg", esc(err.message || "Something went wrong."));
   } finally {
     btn.disabled = false;
-    btn.textContent = "I-save";
+    btn.textContent = "Save";
   }
 });
 
@@ -439,7 +439,7 @@ function renderMembers(){
     !q || (m.full_name + " " + m.email).toLowerCase().includes(q));
 
   if (!list.length) {
-    $("memBody").innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:36px">Walang nahanap.</td></tr>';
+    $("memBody").innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:36px">No results found.</td></tr>';
     return;
   }
   $("memBody").innerHTML = list.map(m => "<tr>" +
@@ -450,8 +450,8 @@ function renderMembers(){
     "</select></td>" +
     "<td>" + m.downloads + "</td>" +
     "<td>" + fmt(m.created_at) + "</td>" +
-    "<td>" + (m.expires_at ? fmt(m.expires_at) : "<span style='color:var(--muted)'>walang expiry</span>") + "</td>" +
-    '<td class="actions"><button class="btn ghost sm" data-exp="' + m.id + '">Itakda ang expiry</button></td></tr>').join("");
+    "<td>" + (m.expires_at ? fmt(m.expires_at) : "<span style='color:var(--muted)'>no expiry</span>") + "</td>" +
+    '<td class="actions"><button class="btn ghost sm" data-exp="' + m.id + '">Set Expiry</button></td></tr>').join("");
 
   $("memBody").querySelectorAll("[data-tier]").forEach(s => {
     s.onchange = async () => {
@@ -459,20 +459,20 @@ function renderMembers(){
       const { error } = await sb.rpc("set_member_tier",
         { target: m.id, new_tier: s.value, until: m.expires_at });
       if (error) { msg("memMsg", esc(error.message)); s.value = m.tier; return; }
-      msg("memMsg", "Na-update ang tier ni " + esc(m.full_name || m.email) + " → " + s.value, "ok");
+      msg("memMsg", "Updated " + esc(m.full_name || m.email) + "'s tier → " + s.value, "ok");
       loadMembers();
     };
   });
   $("memBody").querySelectorAll("[data-exp]").forEach(b => {
     b.onclick = async () => {
       const m = members.find(x => x.id === b.dataset.exp);
-      const v = prompt("Petsa ng expiry (YYYY-MM-DD). Iwanang blangko para walang expiry:",
+      const v = prompt("Expiry date (YYYY-MM-DD). Leave blank for no expiry:",
         m.expires_at ? m.expires_at.slice(0,10) : "");
       if (v === null) return;
       const until = v.trim() ? new Date(v.trim() + "T23:59:59").toISOString() : null;
       const { error } = await sb.rpc("set_member_tier", { target: m.id, new_tier: m.tier, until });
       if (error) return msg("memMsg", esc(error.message));
-      msg("memMsg", "Na-update ang expiry.", "ok");
+      msg("memMsg", "Expiry updated.", "ok");
       loadMembers();
     };
   });

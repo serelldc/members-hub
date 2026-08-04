@@ -1,11 +1,11 @@
 <!DOCTYPE html>
-<html lang="tl">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Digz Members</title>
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
 
@@ -17,31 +17,31 @@
     <p class="sub" id="brandSub"></p>
 
     <div class="tabs">
-      <button id="tabLogin" class="on">Mag-login</button>
-      <button id="tabSignup">Gumawa ng account</button>
+      <button id="tabLogin" class="on">Log In</button>
+      <button id="tabSignup">Create Account</button>
     </div>
 
     <div id="authMsg" class="msg hide"></div>
 
     <form id="authForm">
       <div class="field hide" id="nameField">
-        <label for="fname">Buong pangalan</label>
+        <label for="fname">Full Name</label>
         <input type="text" id="fname" placeholder="Juan Dela Cruz" autocomplete="name">
       </div>
       <div class="field">
         <label for="em">Email</label>
-        <input type="email" id="em" placeholder="ikaw@email.com" autocomplete="username" required>
+        <input type="email" id="em" placeholder="you@email.com" autocomplete="username" required>
       </div>
       <div class="field">
         <label for="pw">Password</label>
         <input type="password" id="pw" placeholder="••••••••" autocomplete="current-password" minlength="6" required>
         <div class="hint" id="pwHint"></div>
       </div>
-      <button type="submit" class="btn full" id="authBtn">Mag-login</button>
+      <button type="submit" class="btn full" id="authBtn">Log In</button>
     </form>
 
     <p style="text-align:center;margin-top:16px;font-size:13px">
-      <a href="#" id="forgotLink" style="color:var(--muted);text-decoration:none">Nakalimutan ang password?</a>
+      <a href="#" id="forgotLink" style="color:var(--muted);text-decoration:none">Forgot password?</a>
     </p>
   </div>
 </div>
@@ -58,13 +58,13 @@
         <span class="name" id="memberName"></span>
         <span class="tier-badge" id="memberTier"></span>
       </div>
-      <button class="btn ghost sm" id="logoutBtn">Mag-logout</button>
+      <button class="btn ghost sm" id="logoutBtn">Log Out</button>
     </div>
   </header>
 
   <main>
     <section class="hero">
-      <h2 id="greet">Kumusta!</h2>
+      <h2 id="greet">Welcome!</h2>
       <p id="heroSub"></p>
     </section>
 
@@ -72,50 +72,50 @@
     <div id="payStatus" class="msg hide"></div>
 
     <div class="stats">
-      <div class="stat"><div class="n" id="sTotal">0</div><div class="l">Meron ngayon</div></div>
-      <div class="stat"><div class="n" id="sNew">0</div><div class="l">Bago ngayong buwan</div></div>
-      <div class="stat"><div class="n" id="sCat">0</div><div class="l">Kategorya</div></div>
-      <div class="stat"><div class="n" id="sDl">0</div><div class="l">Na-download mo</div></div>
+      <div class="stat"><div class="n" id="sTotal">0</div><div class="l">Available Now</div></div>
+      <div class="stat"><div class="n" id="sNew">0</div><div class="l">New This Month</div></div>
+      <div class="stat"><div class="n" id="sCat">0</div><div class="l">Categories</div></div>
+      <div class="stat"><div class="n" id="sDl">0</div><div class="l">You've Downloaded</div></div>
     </div>
 
     <div class="toolbar">
       <div class="search">
         <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input type="search" id="q" placeholder="Maghanap ng product...">
+        <input type="search" id="q" placeholder="Search products...">
       </div>
-      <select id="typeSel"><option value="all">Lahat ng uri</option></select>
+      <select id="typeSel"><option value="all">All Types</option></select>
       <select id="sortSel">
-        <option value="new">Pinakabago muna</option>
-        <option value="az">Pangalan A–Z</option>
+        <option value="new">Newest First</option>
+        <option value="az">Name A–Z</option>
       </select>
     </div>
 
     <div class="chips" id="chips"></div>
-    <div class="grid" id="grid"><div class="empty">Nilo-load ang mga products...</div></div>
+    <div class="grid" id="grid"><div class="empty">Loading products...</div></div>
 
     <!-- UPGRADE -->
     <div id="upgradeSection" class="hide">
-      <h2 class="section-title" id="upTitle">Mag-upgrade para sa mas marami pa</h2>
+      <h2 class="section-title" id="upTitle">Upgrade for More</h2>
       <div class="plans" id="plans"></div>
 
       <div class="gcash-box">
-        <h3>Paano magbayad gamit ang GCash</h3>
+        <h3>How to Pay via GCash</h3>
         <div class="gcash-num">
           <div>
             <div class="big" id="gcNum">0917 123 4567</div>
-            <div class="nm">Pangalan: <b id="gcName">JUAN D.</b></div>
+            <div class="nm">Name: <b id="gcName">JUAN D.</b></div>
           </div>
           <div class="spacer"></div>
-          <button class="btn ghost sm" id="copyNum">Kopyahin ang number</button>
+          <button class="btn ghost sm" id="copyNum">Copy Number</button>
         </div>
         <img id="gcQr" class="hide" alt="GCash QR" style="max-width:220px;border-radius:12px;margin-bottom:16px">
 
         <ol class="steps">
-          <li>Buksan ang GCash app → <b>Send Money</b> → ilagay ang number sa itaas.</li>
-          <li>Ipadala ang eksaktong halaga ng plan na gusto mo.</li>
-          <li>I-screenshot ang <b>receipt</b> (dapat kita ang reference number).</li>
-          <li>Punan ang form sa baba at i-submit ang screenshot.</li>
-          <li>Ia-approve ko ito — karaniwang <b>sa loob ng 24 oras</b>. May email ka kapag active na.</li>
+          <li>Open the GCash app → <b>Send Money</b> → enter the number above.</li>
+          <li>Send the exact amount for the plan you want.</li>
+          <li>Screenshot the <b>receipt</b> (make sure the reference number is visible).</li>
+          <li>Fill out the form below and submit the screenshot.</li>
+          <li>I'll approve it — usually <b>within 24 hours</b>. You'll get an email once it's active.</li>
         </ol>
 
         <div id="payMsg" class="msg hide"></div>
@@ -123,24 +123,24 @@
         <form id="payForm">
           <div class="row2">
             <div class="field">
-              <label for="pTier">Plan na binayaran</label>
+              <label for="pTier">Plan Paid For</label>
               <select id="pTier" required></select>
             </div>
             <div class="field">
-              <label for="pAmt">Halagang ipinadala (₱)</label>
+              <label for="pAmt">Amount Sent (₱)</label>
               <input type="number" id="pAmt" step="0.01" min="1" placeholder="2500" required>
             </div>
           </div>
           <div class="field">
-            <label for="pRef">GCash reference number</label>
-            <input type="text" id="pRef" placeholder="Hal. 1029384756XYZ" required>
+            <label for="pRef">GCash Reference Number</label>
+            <input type="text" id="pRef" placeholder="e.g. 1029384756XYZ" required>
           </div>
           <div class="field">
-            <label for="pFile">Screenshot ng receipt</label>
+            <label for="pFile">Receipt Screenshot</label>
             <input type="file" id="pFile" accept="image/*" required>
-            <div class="hint">JPG o PNG, hanggang 5 MB.</div>
+            <div class="hint">JPG or PNG, up to 5 MB.</div>
           </div>
-          <button type="submit" class="btn" id="payBtn">Isumite ang proof of payment</button>
+          <button type="submit" class="btn" id="payBtn">Submit Proof of Payment</button>
         </form>
       </div>
     </div>
@@ -149,11 +149,11 @@
   <footer>
     <img class="flogo" src="brand-logo.png" alt="">
     <div id="footTxt"></div>
-    <div style="margin-top:8px;opacity:.65">May tanong? <a id="supportLink" href="#">Makipag-ugnayan sa amin</a></div>
+    <div style="margin-top:8px;opacity:.65">Questions? <a id="supportLink" href="#">Contact Us</a></div>
   </footer>
 </div>
 
-<script src="config.js"></script>
+<script src="config.js?v=3"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -167,8 +167,8 @@ const ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stro
 const ICON_WARN = '<svg class="empty-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 9v5"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>';
 const ICON_SEARCH = '<svg class="empty-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>';
 
-// Kumukuha ng 1-2 letrang monogram sa title — ito ang tile kapag walang
-// custom cover image. "Starter Guide" → "SG", "VIP Vault" → "VV".
+// Derives a 1-2 letter monogram from the title — used as the cover tile
+// when there's no custom cover image. "Starter Guide" → "SG", "VIP Vault" → "VV".
 function initials(title){
   const words = String(title || "").trim().split(/\s+/).filter(Boolean);
   if (!words.length) return "•";
@@ -179,8 +179,8 @@ function initials(title){
 if (C.SUPABASE_URL.includes("YOUR-PROJECT-REF")) {
   document.body.innerHTML =
     '<div class="auth-wrap"><div class="auth-box"><div class="msg err">' +
-    '<b>Hindi pa naka-setup.</b><br><br>Buksan ang <code>config.js</code> at ilagay ang ' +
-    'SUPABASE_URL at SUPABASE_ANON_KEY mo. Nasa Supabase Dashboard → Project Settings → API.' +
+    '<b>Not set up yet.</b><br><br>Open <code>config.js</code> and enter your ' +
+    'SUPABASE_URL and SUPABASE_ANON_KEY. Find them in Supabase Dashboard → Project Settings → API.' +
     '</div></div></div>';
   throw new Error("config not set");
 }
@@ -193,7 +193,7 @@ $("navName").textContent = C.brandName;
 $("brandSub").textContent = C.tagline;
 document.title = C.brandName;
 $("footTxt").textContent = "© " + new Date().getFullYear() + " " + C.brandName +
-  " — para sa members lamang. Bawal i-share ang mga files.";
+  " — for members only. Do not share these files.";
 $("supportLink").href = "mailto:" + C.supportEmail;
 
 /* ─────── STATE ─────── */
@@ -210,9 +210,9 @@ function setMode(m){
   $("tabSignup").classList.toggle("on", isSignup);
   $("nameField").classList.toggle("hide", !isSignup);
   $("fname").required = isSignup;
-  $("authBtn").textContent = isSignup ? "Gumawa ng account" : "Mag-login";
+  $("authBtn").textContent = isSignup ? "Create Account" : "Log In";
   $("pw").autocomplete = isSignup ? "new-password" : "current-password";
-  $("pwHint").textContent = isSignup ? "Hindi bababa sa 6 na karakter." : "";
+  $("pwHint").textContent = isSignup ? "At least 6 characters." : "";
   hideMsg("authMsg");
 }
 $("tabLogin").onclick  = () => setMode("login");
@@ -227,12 +227,12 @@ function showMsg(id, text, kind){
 function hideMsg(id){ $(id).classList.add("hide"); }
 
 const NICE = {
-  "Invalid login credentials": "Mali ang email o password.",
-  "Email not confirmed": "I-confirm muna ang email mo. Tingnan ang inbox (at spam folder).",
-  "User already registered": "May account na ang email na ito. Mag-login na lang.",
-  "Password should be at least 6 characters": "Kailangan hindi bababa sa 6 na karakter ang password."
+  "Invalid login credentials": "Incorrect email or password.",
+  "Email not confirmed": "Please confirm your email first. Check your inbox (and spam folder).",
+  "User already registered": "An account already exists for this email. Try logging in instead.",
+  "Password should be at least 6 characters": "Password must be at least 6 characters."
 };
-const niceErr = e => NICE[e?.message] || e?.message || "May nangyaring mali. Subukan ulit.";
+const niceErr = e => NICE[e?.message] || e?.message || "Something went wrong. Please try again.";
 
 $("authForm").addEventListener("submit", async e => {
   e.preventDefault();
@@ -251,8 +251,8 @@ $("authForm").addEventListener("submit", async e => {
       if (error) throw error;
       if (!data.session) {
         showMsg("authMsg",
-          "Nagawa na ang account mo! Nagpadala kami ng <b>confirmation link</b> sa " +
-          esc(email) + ". I-click iyon, tapos bumalik dito at mag-login.", "ok");
+          "Account created! We sent a <b>confirmation link</b> to " +
+          esc(email) + ". Click it, then come back here and log in.", "ok");
         setMode("login");
       }
     } else {
@@ -269,10 +269,10 @@ $("authForm").addEventListener("submit", async e => {
 $("forgotLink").addEventListener("click", async e => {
   e.preventDefault();
   const email = $("em").value.trim().toLowerCase();
-  if (!email) return showMsg("authMsg", "Ilagay muna ang email mo sa taas, tapos i-click ulit ito.", "warn");
+  if (!email) return showMsg("authMsg", "Enter your email above first, then click this again.", "warn");
   const { error } = await sb.auth.resetPasswordForEmail(email, { redirectTo: location.href });
   showMsg("authMsg", error ? esc(niceErr(error))
-    : "Nagpadala kami ng reset link sa " + esc(email) + ".", error ? "err" : "ok");
+    : "We sent a reset link to " + esc(email) + ".", error ? "err" : "ok");
 });
 
 $("logoutBtn").onclick = async () => { await sb.auth.signOut(); location.reload(); };
@@ -302,12 +302,12 @@ async function boot(){
   const { data:prof } = await sb.from("profiles").select("*").eq("id", user.id).single();
   profile = prof || { full_name: user.email.split("@")[0], tier: "free", is_admin: false };
 
-  // Generic greeting — hindi time-of-day-based dahil iba-iba ang timezone
-  // at lokasyon ng mga members.
+  // Generic greeting — not time-of-day based, since members are spread
+  // across different timezones and locations.
   const first = (profile.full_name || "Member").split(" ")[0];
   $("greet").textContent = "Welcome, Digz " + first + "!";
-  $("heroSub").textContent = "Nasa ibaba lahat ng digital products na kasama sa iyong " +
-    profile.tier.toUpperCase() + " membership. I-click ang Download para makuha ang file.";
+  $("heroSub").textContent = "Below is everything included in your " +
+    profile.tier.toUpperCase() + " membership. Click Download to get the file.";
   $("memberName").textContent = profile.full_name || user.email;
   $("avatar").textContent = (profile.full_name || user.email).charAt(0).toUpperCase();
   const tb = $("memberTier");
@@ -323,14 +323,14 @@ async function boot(){
 
 /* ─────── PRODUCTS ─────── */
 async function loadProducts(){
-  // Ang RLS na mismo ang pumipili — hindi man lang naipapadala ng server
-  // ang naka-lock na rows, kaya hindi makikita ang download links nila.
+  // RLS itself decides what's returned — locked rows never even reach the
+  // browser, so their download links can't be seen either.
   const { data, error } = await sb.from("products")
     .select("*").eq("published", true)
     .order("sort_order").order("created_at", { ascending:false });
 
   if (error) {
-    $("grid").innerHTML = '<div class="empty">' + ICON_WARN + 'Hindi ma-load ang products.<br><small>' +
+    $("grid").innerHTML = '<div class="empty">' + ICON_WARN + 'Could not load products.<br><small>' +
       esc(error.message) + '</small></div>';
     return;
   }
@@ -343,13 +343,13 @@ function buildFilters(){
   const cats = ["all", ...new Set(products.map(p => p.category))];
   $("chips").innerHTML = cats.map(c =>
     '<button class="chip' + (c === state.cat ? " on" : "") + '" data-cat="' + esc(c) + '">' +
-    (c === "all" ? "Lahat" : esc(c)) + "</button>").join("");
+    (c === "all" ? "All" : esc(c)) + "</button>").join("");
   $("chips").querySelectorAll(".chip").forEach(b => {
     b.onclick = () => { state.cat = b.dataset.cat; buildFilters(); render(); };
   });
 
   const sel = $("typeSel");
-  sel.innerHTML = '<option value="all">Lahat ng uri</option>';
+  sel.innerHTML = '<option value="all">All Types</option>';
   [...new Set(products.map(p => p.kind))].forEach(t => sel.add(new Option(t, t)));
   sel.value = state.type;
 }
@@ -378,15 +378,15 @@ function render(){
 
   if (!list.length){
     $("grid").innerHTML = '<div class="empty">' + ICON_SEARCH +
-      (products.length ? "Walang nahanap. Subukan ang ibang search o filter."
-                       : "Wala pang products dito. Bumalik ka mamaya!") + "</div>";
+      (products.length ? "No results found. Try a different search or filter."
+                       : "No products here yet. Check back soon!") + "</div>";
     return;
   }
 
   $("grid").innerHTML = list.map(p => {
     const isNew = new Date(p.created_at) > monthAgo;
-    // Sariling cover ng product muna; kung wala, larawan ng kategorya
-    // (config.js → categoryImages); kung wala rin iyon, monogram tile.
+    // Product's own cover first; if none, the category image
+    // (config.js → categoryImages); if that's missing too, a monogram tile.
     const ownImg = /^https?:\/\//.test(p.cover || "");
     const catImg = !ownImg && C.categoryImages && C.categoryImages[p.category];
     const bgUrl = ownImg ? p.cover : (catImg || "");
@@ -400,7 +400,7 @@ function render(){
         '<span class="kind-tag">' + esc(p.kind) + '</span>';
     return '<article class="card">' +
       '<div class="cover" style="' + style + '">' + coverInner +
-        (isNew ? '<span class="tag new">Bago</span>' : "") +
+        (isNew ? '<span class="tag new">New</span>' : "") +
       '</div>' +
       '<div class="card-body">' +
         "<h3>" + esc(p.title) + "</h3>" +
@@ -410,7 +410,7 @@ function render(){
           '<span class="pill">' + esc(p.category) + "</span>" +
           (p.file_size ? '<span class="pill">' + esc(p.file_size) + "</span>" : "") +
         "</div>" +
-        '<button class="dl" data-id="' + p.id + '">' + ICON_DL + '<span>I-download</span></button>' +
+        '<button class="dl" data-id="' + p.id + '">' + ICON_DL + '<span>Download</span></button>' +
       "</div></article>";
   }).join("");
 
@@ -421,24 +421,24 @@ async function download(btn){
   const p = products.find(x => x.id === btn.dataset.id);
   if (!p) return;
   const orig = btn.innerHTML;
-  btn.innerHTML = "<span>Inihahanda...</span>";
+  btn.innerHTML = "<span>Preparing...</span>";
   btn.disabled = true;
   try {
     let url = p.external_url;
     if (p.storage_path) {
-      // Signed URL — nag-e-expire, hindi pwedeng i-forward sa iba nang matagalan
+      // Signed URL — expires, cannot be forwarded to others long-term
       const { data, error } = await sb.storage.from("products")
         .createSignedUrl(p.storage_path, C.signedUrlSeconds, { download:true });
       if (error) throw error;
       url = data.signedUrl;
     }
-    if (!url) throw new Error("Wala pang naka-attach na file sa product na ito.");
+    if (!url) throw new Error("No file has been attached to this product yet.");
     sb.from("downloads").insert({ product_id: p.id,
       user_id: (await sb.auth.getUser()).data.user.id }).then(()=>{});
     window.open(url, "_blank", "noopener");
     loadDlCount();
   } catch(err) {
-    alert("Hindi ma-download: " + (err.message || err));
+    alert("Could not download: " + (err.message || err));
   } finally {
     btn.innerHTML = orig;
     btn.disabled = false;
@@ -454,15 +454,15 @@ async function loadDlCount(){
 function buildUpgrade(){
   const rank = TIER[profile.tier] || 1;
   const avail = Object.entries(C.pricing).filter(([k]) => TIER[k] > rank);
-  if (!avail.length) return;   // wala nang mas mataas na tier — walang ipapakita
+  if (!avail.length) return;   // no higher tier left — nothing to show
 
   $("upgradeSection").classList.remove("hide");
   $("plans").innerHTML = avail.map(([key, p], i) =>
     '<div class="plan' + (i === 0 ? " hot" : "") + '">' +
       "<h3>" + esc(p.label) + "</h3>" +
-      '<div class="price">₱' + p.price.toLocaleString() + " <small>isang beses lang</small></div>" +
+      '<div class="price">₱' + p.price.toLocaleString() + " <small>one-time</small></div>" +
       "<ul>" + p.perks.map(x => "<li>" + esc(x) + "</li>").join("") + "</ul>" +
-      '<button class="btn full" data-pick="' + key + '" data-amt="' + p.price + '">Piliin ang ' + esc(p.label) + "</button>" +
+      '<button class="btn full" data-pick="' + key + '" data-amt="' + p.price + '">Choose ' + esc(p.label) + "</button>" +
     "</div>").join("");
 
   const sel = $("pTier");
@@ -484,8 +484,8 @@ function buildUpgrade(){
   if (C.gcash.qrImage) { $("gcQr").src = C.gcash.qrImage; $("gcQr").classList.remove("hide"); }
   $("copyNum").onclick = () => {
     navigator.clipboard.writeText(C.gcash.number.replace(/\s/g,""));
-    $("copyNum").textContent = "Nakopya na";
-    setTimeout(() => $("copyNum").textContent = "Kopyahin ang number", 1800);
+    $("copyNum").textContent = "Copied";
+    setTimeout(() => $("copyNum").textContent = "Copy Number", 1800);
   };
 }
 
@@ -495,24 +495,24 @@ async function loadPayStatus(){
   const r = data?.[0];
   if (!r) return;
   if (r.status === "pending")
-    showMsg("payStatus", "<b>Nasa review ang bayad mo.</b> Nakatanggap kami ng request para sa <b>" +
-      esc(r.requested_tier.toUpperCase()) + "</b>. Ia-approve ko ito sa loob ng 24 oras.", "warn");
+    showMsg("payStatus", "<b>Your payment is under review.</b> We received a request for <b>" +
+      esc(r.requested_tier.toUpperCase()) + "</b>. I'll approve it within 24 hours.", "warn");
   else if (r.status === "rejected")
-    showMsg("payStatus", "<b>Hindi na-approve ang huling submission mo.</b>" +
-      (r.admin_note ? " Dahilan: " + esc(r.admin_note) : "") +
-      " Pwede kang mag-submit ulit sa baba, o mag-email sa akin.", "err");
+    showMsg("payStatus", "<b>Your last submission wasn't approved.</b>" +
+      (r.admin_note ? " Reason: " + esc(r.admin_note) : "") +
+      " You can submit again below, or email me.", "err");
 }
 
 $("payForm").addEventListener("submit", async e => {
   e.preventDefault();
   const btn = $("payBtn");
   btn.disabled = true;
-  btn.textContent = "Ini-upload...";
+  btn.textContent = "Uploading...";
   hideMsg("payMsg");
   try {
     const file = $("pFile").files[0];
-    if (!file) throw new Error("Pumili ng screenshot.");
-    if (file.size > 5 * 1024 * 1024) throw new Error("Masyadong malaki ang file (max 5 MB).");
+    if (!file) throw new Error("Please choose a screenshot.");
+    if (file.size > 5 * 1024 * 1024) throw new Error("File is too large (max 5 MB).");
 
     const { data:{ user } } = await sb.auth.getUser();
     const ext  = (file.name.split(".").pop() || "jpg").toLowerCase();
@@ -531,14 +531,14 @@ $("payForm").addEventListener("submit", async e => {
     });
     if (insErr) throw insErr;
 
-    showMsg("payMsg", "<b>Nasumite na!</b> Iri-review ko ang bayad mo at ia-activate ang account " +
-      "sa loob ng 24 oras. May makikita kang update dito pagbalik mo.", "ok");
+    showMsg("payMsg", "<b>Submitted!</b> I'll review your payment and activate your account " +
+      "within 24 hours. You'll see an update here when you're back.", "ok");
     $("payForm").reset();
   } catch(err) {
-    showMsg("payMsg", esc(err.message || "May nangyaring mali."), "err");
+    showMsg("payMsg", esc(err.message || "Something went wrong."), "err");
   } finally {
     btn.disabled = false;
-    btn.textContent = "Isumite ang proof of payment";
+    btn.textContent = "Submit Proof of Payment";
   }
 });
 
