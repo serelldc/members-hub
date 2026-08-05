@@ -27,6 +27,11 @@ window.CFG = {
 
   supportEmail: "strategicresource.dc@gmail.com",
 
+  /* The Systeme.io link members share on the "Refer a Friend" tab.
+     Their personal ?agent=<code> is appended automatically if the
+     admin has set an agent code for them in the Members tab. */
+  agentLinkBase: "https://ebookcoaching.systeme.io/ebook",
+
   /* Larawan per kategorya — ginagamit bilang cover ng product card kapag
      walang sariling cover image ang product mismo. I-match ang key sa
      eksaktong pangalan ng kategorya (case-sensitive) na nasa Admin →

@@ -91,7 +91,7 @@
       <div id="memMsg" class="msg hide"></div>
       <div class="tblwrap"><table>
         <thead><tr><th>Name</th><th>Email</th><th>Tier</th><th>Downloads</th>
-          <th>Referrals</th><th>Joined</th><th>Expires</th><th></th></tr></thead>
+          <th>Agent Link</th><th>Joined</th><th>Expires</th><th></th></tr></thead>
         <tbody id="memBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
       </table></div>
     </section>
@@ -117,9 +117,6 @@
 
       <h2 class="section-title">Top Products by Downloads</h2>
       <div id="topProdList" class="bar-list"></div>
-
-      <h2 class="section-title">Referral Leaderboard</h2>
-      <div id="refLeaderList" class="bar-list"></div>
     </section>
   </main>
 </div>
@@ -177,7 +174,7 @@
   </div>
 </div>
 
-<script src="config.js?v=7"></script>
+<script src="config.js?v=8"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -292,8 +289,8 @@ $("expPay").onclick = () => {
 };
 $("expMem").onclick = () => {
   const rows = members.map(m => [m.full_name || "", m.email, m.tier, m.downloads,
-    fmt(m.created_at), m.expires_at ? fmt(m.expires_at) : "", m.referral_code || "", m.referral_count ?? 0]);
-  downloadCSV("members.csv", toCSV(rows, ["Name","Email","Tier","Downloads","Joined","Expires","Referral Code","Referrals"]));
+    m.agent_code || "", fmt(m.created_at), m.expires_at ? fmt(m.expires_at) : ""]);
+  downloadCSV("members.csv", toCSV(rows, ["Name","Email","Tier","Downloads","Agent Code","Joined","Expires"]));
 };
 
 async function loadAll(){
@@ -510,10 +507,24 @@ function renderMembers(){
       ["free","premium","vip"].map(t => '<option value="' + t + '"' + (m.tier === t ? " selected" : "") + ">" + t + "</option>").join("") +
     "</select></td>" +
     "<td>" + m.downloads + "</td>" +
-    "<td>" + (m.referral_count || 0) + "</td>" +
+    "<td>" + (m.agent_code ? "<code style='font-size:12px'>" + esc(m.agent_code) + "</code>" : "<span style='color:var(--muted)'>not set</span>") + "</td>" +
     "<td>" + fmt(m.created_at) + "</td>" +
     "<td>" + (m.expires_at ? fmt(m.expires_at) : "<span style='color:var(--muted)'>no expiry</span>") + "</td>" +
-    '<td class="actions"><button class="btn ghost sm" data-exp="' + m.id + '">Set Expiry</button></td></tr>').join("");
+    '<td class="actions"><button class="btn ghost sm" data-agent="' + m.id + '">Set Agent Link</button>' +
+      '<button class="btn ghost sm" data-exp="' + m.id + '">Set Expiry</button></td></tr>').join("");
+
+  $("memBody").querySelectorAll("[data-agent]").forEach(b => {
+    b.onclick = async () => {
+      const m = members.find(x => x.id === b.dataset.agent);
+      const v = prompt("Agent code for " + (m.full_name || m.email) +
+        " (used as ?agent=CODE in their Systeme.io link). Leave blank to remove:", m.agent_code || "");
+      if (v === null) return;
+      const { error } = await sb.rpc("set_member_agent_code", { target: m.id, code: v });
+      if (error) return msg("memMsg", esc(error.message));
+      msg("memMsg", "Agent link updated.", "ok");
+      loadMembers();
+    };
+  });
 
   $("memBody").querySelectorAll("[data-tier]").forEach(s => {
     s.onchange = async () => {
@@ -606,7 +617,6 @@ async function loadAnalytics(){
   }
   if (!e2 && top) renderBarList("topProdList", top.map(t => ({ label: t.title, value: Number(t.download_count) })));
   else renderBarList("topProdList", []);
-  renderReferralLeaderboard();
 }
 
 function renderBarList(elId, rows){
@@ -617,15 +627,6 @@ function renderBarList(elId, rows){
     '<div class="bar-row"><div class="bar-label">' + esc(r.label) + "</div>" +
     '<div class="bar-track"><div class="bar-fill" style="width:' + Math.round(r.value / max * 100) + '%"></div></div>' +
     '<div class="bar-val">' + r.value + "</div></div>").join("");
-}
-
-function renderReferralLeaderboard(){
-  const rows = members
-    .filter(m => Number(m.referral_count) > 0)
-    .sort((a,b) => b.referral_count - a.referral_count)
-    .slice(0, 5)
-    .map(m => ({ label: m.full_name || m.email, value: Number(m.referral_count) }));
-  renderBarList("refLeaderList", rows);
 }
 </script>
 </body>

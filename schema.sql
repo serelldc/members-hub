@@ -443,19 +443,40 @@ language sql stable security definer set search_path = public as $$
   limit limit_n;
 $$;
 
--- Extend the members RPC with referral info (recreated with new return shape)
+-- ═══════════════════════════════════════════════════════════════
+--  11. AGENT LINKS — per-member Systeme.io referral link, set by
+--      admin. Shown to the member on the "Refer a Friend" tab as
+--      https://ebookcoaching.systeme.io/ebook?agent=<agent_code>
+-- ═══════════════════════════════════════════════════════════════
+
+alter table public.profiles add column if not exists agent_code text;
+
+-- One-time convenience backfill for known agents (safe to re-run).
+update public.profiles set agent_code = 'Delia' where email = 'muhrddelia@gmail.com' and agent_code is null;
+update public.profiles set agent_code = 'Mia'   where email = 'mdpanopio0423@gmail.com' and agent_code is null;
+update public.profiles set agent_code = 'Agnes'  where email = 'miraplesagnes9@gmail.com' and agent_code is null;
+
+create or replace function public.set_member_agent_code(target uuid, code text)
+returns void language plpgsql security definer set search_path = public as $$
+begin
+  if not public.is_admin() then raise exception 'Not authorized'; end if;
+  update public.profiles set agent_code = nullif(trim(code), '') where id = target;
+end $$;
+
+-- Extend the members RPC with referral + agent-code info (recreated with new return shape)
 drop function if exists public.admin_list_members();
 create or replace function public.admin_list_members()
 returns table (
   id uuid, email text, full_name text, tier text,
   is_admin boolean, expires_at timestamptz, created_at timestamptz,
-  downloads bigint, referral_code text, referral_count bigint
+  downloads bigint, referral_code text, referral_count bigint, agent_code text
 )
 language sql stable security definer set search_path = public as $$
   select p.id, p.email, p.full_name, p.tier, p.is_admin, p.expires_at, p.created_at,
          (select count(*) from public.downloads d where d.user_id = p.id),
          p.referral_code,
-         (select count(*) from public.profiles r where r.referred_by = p.id)
+         (select count(*) from public.profiles r where r.referred_by = p.id),
+         p.agent_code
   from public.profiles p
   where public.is_admin()
   order by p.created_at desc;
