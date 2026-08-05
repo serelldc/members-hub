@@ -189,6 +189,8 @@ td.actions{white-space:nowrap;display:flex;gap:6px}
 footer{border-top:1px solid var(--line);margin-top:56px;padding:24px 22px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.8;position:relative;z-index:1}
 footer a{text-decoration:none}
 footer .flogo{height:22px;width:auto;opacity:.5;margin-bottom:10px}
+footer .about-txt{max-width:520px;margin:0 auto 14px;color:var(--txt);opacity:.85;font-size:13px;line-height:1.6}
+footer .about-txt b{color:var(--accent)}
 
 @media(max-width:720px){
   .stats{grid-template-columns:repeat(2,1fr)}

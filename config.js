@@ -17,7 +17,10 @@ window.CFG = {
   /* ── 2. BRANDING ──────────────────────────────────────────────── */
   brandName: "Digz Members",
   initial:   "D",
-  tagline:   "All your digital products, in one place.",
+  tagline:   "DIGZ = Digital Innovators & Growth Zone.",
+
+  /* Shown in the footer on every page — explains what "Digz" means. */
+  about: "<b>DIGZ</b> = Digital Innovators & Growth Zone. Ka Digz is a community of digital creators turning ideas into digital products.",
 
   /* Banner on the dashboard. Set to "" to hide it. HTML is allowed. */
   announcement: "<b>New!</b> New templates added this month — scroll down to see.",

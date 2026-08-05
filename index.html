@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Digz Members</title>
-<link rel="stylesheet" href="style.css?v=3">
+<link rel="stylesheet" href="style.css?v=4">
 </head>
 <body>
 
@@ -148,12 +148,13 @@
 
   <footer>
     <img class="flogo" src="brand-logo.png" alt="">
+    <div id="aboutTxt" class="about-txt"></div>
     <div id="footTxt"></div>
     <div style="margin-top:8px;opacity:.65">Questions? <a id="supportLink" href="#">Contact Us</a></div>
   </footer>
 </div>
 
-<script src="config.js?v=4"></script>
+<script src="config.js?v=5"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -192,6 +193,7 @@ $("brandTitle").textContent = C.brandName;
 $("navName").textContent = C.brandName;
 $("brandSub").textContent = C.tagline;
 document.title = C.brandName;
+if (C.about) $("aboutTxt").innerHTML = C.about;
 $("footTxt").textContent = "© " + new Date().getFullYear() + " " + C.brandName +
   " — for members only. Do not share these files.";
 $("supportLink").href = "mailto:" + C.supportEmail;
