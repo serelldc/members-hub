@@ -184,6 +184,18 @@ const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;")
   .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 const fmt = d => d ? new Date(d).toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"}) : "—";
 const peso = n => n == null ? "—" : "₱" + Number(n).toLocaleString("en-PH",{minimumFractionDigits:2});
+// Accepts a short code ("Delia"), a full Systeme.io link
+// (".../ebook?agent=Delia"), or messy pasted text with the link buried in
+// it, and always returns just the clean code Systeme.io expects.
+function extractAgentCode(raw){
+  const s = String(raw || "").trim();
+  const m = s.match(/[?&]agent=([^&\s]+)/i);
+  if (m) { try { return decodeURIComponent(m[1]); } catch(e) { return m[1]; } }
+  const lines = s.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
+  const last = lines.length ? lines[lines.length - 1] : s;
+  return last.replace(/^https?:\/\/\S+$/i, "").trim();
+}
+
 function initials(title){
   const words = String(title || "").trim().split(/\s+/).filter(Boolean);
   if (!words.length) return "•";
@@ -517,11 +529,13 @@ function renderMembers(){
     b.onclick = async () => {
       const m = members.find(x => x.id === b.dataset.agent);
       const v = prompt("Agent code for " + (m.full_name || m.email) +
-        " (used as ?agent=CODE in their Systeme.io link). Leave blank to remove:", m.agent_code || "");
+        " — short code lang (hal. Delia, Mia, Agnes). Pwede ring i-paste ang buong " +
+        "Systeme.io link, kukunin na lang namin ang code. Leave blank to remove:", m.agent_code || "");
       if (v === null) return;
-      const { error } = await sb.rpc("set_member_agent_code", { target: m.id, code: v });
+      const code = extractAgentCode(v);
+      const { error } = await sb.rpc("set_member_agent_code", { target: m.id, code });
       if (error) return msg("memMsg", esc(error.message));
-      msg("memMsg", "Agent link updated.", "ok");
+      msg("memMsg", code ? "Agent link updated: " + esc(code) : "Agent link removed.", "ok");
       loadMembers();
     };
   });
