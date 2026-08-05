@@ -5,12 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Admin — Digz Members</title>
-<link rel="stylesheet" href="style.css?v=6">
+<link rel="stylesheet" href="style.css?v=7">
+<script>(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light");}catch(e){}})();</script>
 </head>
 <body>
 
 <div id="gate" class="auth-wrap hide">
   <div class="auth-box">
+    <button class="theme-toggle" id="themeToggleAuth" title="Switch light / dark mode" aria-label="Switch light / dark mode"></button>
     <div class="brand-mark"><img src="brand-logo.png" alt=""></div>
     <h1>Admin Panel</h1>
     <p class="sub" id="gateSub">Log in with your admin account.</p>
@@ -32,6 +34,7 @@
     <div class="topbar-in">
       <a class="logo" href="index.html"><img src="brand-logo.png" alt=""><span class="logo-tag">Admin</span></a>
       <div class="spacer"></div>
+      <button class="theme-toggle" id="themeToggleApp" title="Switch light / dark mode" aria-label="Switch light / dark mode"></button>
       <a href="index.html" class="btn ghost sm">View as Member</a>
       <button class="btn ghost sm" id="out">Log Out</button>
     </div>
@@ -183,6 +186,22 @@ const $ = id => document.getElementById(id);
 const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;")
   .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
 const fmt = d => d ? new Date(d).toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"}) : "—";
+
+/* ─────── THEME TOGGLE ─────── */
+const ICON_SUN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
+const ICON_MOON = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>';
+function applyTheme(theme){
+  document.documentElement.setAttribute("data-theme", theme);
+  try { localStorage.setItem("theme", theme); } catch(e){}
+  const icon = theme === "light" ? ICON_MOON : ICON_SUN;
+  [$("themeToggleAuth"), $("themeToggleApp")].forEach(b => { if (b) b.innerHTML = icon; });
+}
+function toggleTheme(){
+  applyTheme(document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light");
+}
+applyTheme(document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark");
+$("themeToggleAuth").onclick = toggleTheme;
+$("themeToggleApp").onclick = toggleTheme;
 const peso = n => n == null ? "—" : "₱" + Number(n).toLocaleString("en-PH",{minimumFractionDigits:2});
 // Accepts a short code ("Delia"), a full Systeme.io link
 // (".../ebook?agent=Delia"), or messy pasted text with the link buried in
