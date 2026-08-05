@@ -78,10 +78,10 @@ svg{display:block}
 
 main{max-width:1180px;margin:0 auto;padding:26px 22px 80px;position:relative;z-index:1}
 
-.hero{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;margin-bottom:20px;position:relative;overflow:hidden}
+.hero{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px 28px;margin-bottom:20px;position:relative;overflow:hidden;animation:heroIn .6s cubic-bezier(.16,1,.3,1)}
 .hero::before{content:"";position:absolute;inset:0;background:radial-gradient(420px 220px at 100% 0%, var(--accent-dim), transparent 70%);pointer-events:none}
-.hero h2{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:7px;position:relative}
-.hero p{color:var(--muted);font-size:14px;line-height:1.6;max-width:640px;position:relative}
+.hero h2{font-size:22px;font-weight:700;letter-spacing:-.3px;margin-bottom:7px;position:relative;animation:greetIn .55s cubic-bezier(.16,1,.3,1) .1s both}
+.hero p{color:var(--muted);font-size:14px;line-height:1.6;max-width:640px;position:relative;animation:greetIn .55s cubic-bezier(.16,1,.3,1) .2s both}
 
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px}
 .stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:15px 17px}
@@ -102,7 +102,16 @@ main{max-width:1180px;margin:0 auto;padding:26px 22px 80px;position:relative;z-i
 
 /* ─── PRODUCT CARDS ─── */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:16px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:.15s}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:border-color .15s,box-shadow .15s;animation:cardIn .45s cubic-bezier(.16,1,.3,1) both}
+.grid .card:nth-child(1){animation-delay:.02s}
+.grid .card:nth-child(2){animation-delay:.06s}
+.grid .card:nth-child(3){animation-delay:.10s}
+.grid .card:nth-child(4){animation-delay:.14s}
+.grid .card:nth-child(5){animation-delay:.18s}
+.grid .card:nth-child(6){animation-delay:.22s}
+.grid .card:nth-child(7){animation-delay:.26s}
+.grid .card:nth-child(8){animation-delay:.30s}
+.grid .card:nth-child(n+9){animation-delay:.33s}
 .card:hover{border-color:var(--line-hi);box-shadow:0 10px 26px rgba(0,0,0,.4)}
 .cover{height:124px;position:relative;background:linear-gradient(160deg,#161d29,#0e131b);background-size:cover;background-position:center}
 .cover::after{content:"";position:absolute;inset:0;background:radial-gradient(160px 120px at 14% 12%, rgba(91,144,245,.20), transparent 72%);pointer-events:none}
@@ -115,9 +124,12 @@ main{max-width:1180px;margin:0 auto;padding:26px 22px 80px;position:relative;z-i
 .card-body p{font-size:13px;color:var(--muted);line-height:1.55;flex:1;margin-bottom:13px}
 .meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px}
 .pill{font-size:9.5px;font-weight:600;padding:3px 8px;border-radius:5px;background:transparent;border:1px solid var(--line);color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
-.dl{width:100%;padding:10px;border-radius:8px;font-weight:600;font-size:13.5px;background:var(--accent);color:#fff}
+.dl{width:100%;padding:10px;border-radius:8px;font-weight:600;font-size:13.5px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;transition:filter .15s}
 .dl:hover{filter:brightness(1.08)}
 .dl.locked{background:var(--card2);color:var(--muted);border:1px solid var(--line)}
+.dl svg{width:16px;height:16px;flex-shrink:0;animation:dlBounce 1.8s ease-in-out infinite}
+.dl:hover svg{animation-duration:.7s}
+.dl.locked svg{animation:none}
 
 .empty{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--muted);background:var(--card);border:1px dashed var(--line);border-radius:var(--radius);line-height:1.6}
 .empty .big{font-size:32px;margin-bottom:10px}
@@ -185,4 +197,26 @@ footer .flogo{height:22px;width:auto;opacity:.5;margin-bottom:10px}
   main{padding:20px 15px 60px}
   .topbar-in{padding:11px 15px}
   .row2{grid-template-columns:1fr}
+}
+
+/* ─── ANIMATIONS ─── */
+@keyframes heroIn{
+  from{opacity:0; transform:translateY(14px)}
+  to{opacity:1; transform:translateY(0)}
+}
+@keyframes greetIn{
+  from{opacity:0; transform:translateY(8px)}
+  to{opacity:1; transform:translateY(0)}
+}
+@keyframes cardIn{
+  from{opacity:0; transform:translateY(10px) scale(.98)}
+  to{opacity:1; transform:translateY(0) scale(1)}
+}
+@keyframes dlBounce{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(3px)}
+}
+
+@media (prefers-reduced-motion: reduce){
+  .hero, .hero h2, .hero p, .card, .dl svg{animation:none !important}
 }
