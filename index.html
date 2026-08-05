@@ -601,7 +601,11 @@ async function loadSuggestions(){
 function setupReferral(){
   const box = $("referBox");
   if (profile.agent_code) {
-    const link = C.agentLinkBase + "?agent=" + encodeURIComponent(profile.agent_code);
+    // If admin stored a full URL (e.g. the owner's own base link with no
+    // ?agent= param), use it as-is. Otherwise treat it as a short code.
+    const link = /^https?:\/\//i.test(profile.agent_code)
+      ? profile.agent_code
+      : C.agentLinkBase + "?agent=" + encodeURIComponent(profile.agent_code);
     box.innerHTML =
       '<p style="color:var(--muted);font-size:13.5px;margin-bottom:18px;line-height:1.6">' +
         "This is your personal referral link. Share it with friends — signups through it are credited to you." +

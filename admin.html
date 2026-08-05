@@ -189,11 +189,16 @@ const peso = n => n == null ? "—" : "₱" + Number(n).toLocaleString("en-PH",{
 // it, and always returns just the clean code Systeme.io expects.
 function extractAgentCode(raw){
   const s = String(raw || "").trim();
-  const m = s.match(/[?&]agent=([^&\s]+)/i);
-  if (m) { try { return decodeURIComponent(m[1]); } catch(e) { return m[1]; } }
+  // "...?agent=Delia" or "...&agent=Delia" -> pull out just "Delia".
+  const m = s.match(/[?&]agent=([^&\s]*)/i);
+  if (m) {
+    if (!m[1]) return "";                 // "agent=" with nothing after it — treat as blank
+    try { return decodeURIComponent(m[1]); } catch(e) { return m[1]; }
+  }
+  // No ?agent= param at all — could be a plain short code ("Delia") or a
+  // bare base link the owner wants used as-is (no ?agent= appended later).
   const lines = s.split(/\r?\n/).map(x => x.trim()).filter(Boolean);
-  const last = lines.length ? lines[lines.length - 1] : s;
-  return last.replace(/^https?:\/\/\S+$/i, "").trim();
+  return lines.length ? lines[lines.length - 1] : s;
 }
 
 function initials(title){
