@@ -19,7 +19,7 @@ window.CFG = {
   initial:   "D",
   tagline:   "DIGZ = Digital Innovators & Growth Zone.",
 
-  /* Shown in the footer on every page — explains what "Digz" means. */
+  /* Shown in the welcome/hero area on the dashboard — explains what "Digz" means. */
   about: "<b>DIGZ</b> = Digital Innovators & Growth Zone. Ka Digz is a community of digital creators turning ideas into digital products.",
 
   /* Banner on the dashboard. Set to "" to hide it. HTML is allowed. */
@@ -63,7 +63,24 @@ window.CFG = {
   },
 
 
-  /* ── 4. IBA PA ────────────────────────────────────────────────── */
+  /* ── 4. FAQ — shown in the FAQ tab. Edit freely, any length. ────── */
+  faq: [
+    { q: "How do I upgrade my membership?",
+      d: "Go to the \"Upgrade\" section on your dashboard, send the GCash payment, then submit the screenshot with your reference number. It's usually approved within 24 hours." },
+    { q: "I paid but my account still shows Free. What do I do?",
+      d: "Check the message banner near the top of your dashboard — it shows the status of your last payment submission. If it's been more than 24 hours, email us using the Contact Us link in the footer." },
+    { q: "I forgot my password. How do I reset it?",
+      d: "Click \"Forgot password?\" on the login screen and enter your email. If the reset email doesn't arrive, contact us directly and we'll reset it from our end." },
+    { q: "Can I download a product more than once?",
+      d: "Yes — as long as it's included in your current tier, you can download it anytime, as many times as you like." },
+    { q: "A download link isn't working. What should I do?",
+      d: "Download links expire after an hour for security. Just go back to the product and click Download again to get a fresh link. If it still doesn't work, contact us." },
+    { q: "Can I share my account or the files with someone else?",
+      d: "No — access is for your personal use only. Please don't share your login or redistribute the files." }
+  ],
+
+
+  /* ── 5. IBA PA ────────────────────────────────────────────────── */
   signedUrlSeconds: 3600,   // gaano katagal valid ang download link (1 oras)
   adminPath: "admin.html"
 };

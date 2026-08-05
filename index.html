@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Digz Members</title>
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -72,79 +72,148 @@
     <div id="announce" class="msg warn hide"></div>
     <div id="payStatus" class="msg hide"></div>
 
-    <div class="stats">
-      <div class="stat"><div class="n" id="sTotal">0</div><div class="l">Available Now</div></div>
-      <div class="stat"><div class="n" id="sNew">0</div><div class="l">New This Month</div></div>
-      <div class="stat"><div class="n" id="sCat">0</div><div class="l">Categories</div></div>
-      <div class="stat"><div class="n" id="sDl">0</div><div class="l">You've Downloaded</div></div>
+    <div class="chips" id="viewNav">
+      <button class="chip on" data-view="browse">Browse Products</button>
+      <button class="chip" data-view="downloads">My Downloads</button>
+      <button class="chip" data-view="suggest">Suggest a Product</button>
+      <button class="chip" data-view="refer">Refer a Friend</button>
+      <button class="chip" data-view="faq">FAQ</button>
     </div>
 
-    <div class="toolbar">
-      <div class="search">
-        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
-        <input type="search" id="q" placeholder="Search products...">
+    <!-- ═══════ BROWSE ═══════ -->
+    <section id="view-browse">
+      <div class="stats">
+        <div class="stat"><div class="n" id="sTotal">0</div><div class="l">Available Now</div></div>
+        <div class="stat"><div class="n" id="sNew">0</div><div class="l">New This Month</div></div>
+        <div class="stat"><div class="n" id="sCat">0</div><div class="l">Categories</div></div>
+        <div class="stat"><div class="n" id="sDl">0</div><div class="l">You've Downloaded</div></div>
       </div>
-      <select id="typeSel"><option value="all">All Types</option></select>
-      <select id="sortSel">
-        <option value="new">Newest First</option>
-        <option value="az">Name A–Z</option>
-      </select>
-    </div>
 
-    <div class="chips" id="chips"></div>
-    <div class="grid" id="grid"><div class="empty">Loading products...</div></div>
-
-    <!-- UPGRADE -->
-    <div id="upgradeSection" class="hide">
-      <h2 class="section-title" id="upTitle">Upgrade for More</h2>
-      <div class="plans" id="plans"></div>
-
-      <div class="gcash-box">
-        <h3>How to Pay via GCash</h3>
-        <div class="gcash-num">
-          <div>
-            <div class="big" id="gcNum">0917 123 4567</div>
-            <div class="nm">Name: <b id="gcName">JUAN D.</b></div>
-          </div>
-          <div class="spacer"></div>
-          <button class="btn ghost sm" id="copyNum">Copy Number</button>
+      <div class="toolbar">
+        <div class="search">
+          <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="search" id="q" placeholder="Search products...">
         </div>
-        <img id="gcQr" class="hide" alt="GCash QR" style="max-width:220px;border-radius:12px;margin-bottom:16px">
+        <select id="typeSel"><option value="all">All Types</option></select>
+        <select id="sortSel">
+          <option value="new">Newest First</option>
+          <option value="az">Name A–Z</option>
+        </select>
+      </div>
 
-        <ol class="steps">
-          <li>Open the GCash app → <b>Send Money</b> → enter the number above.</li>
-          <li>Send the exact amount for the plan you want.</li>
-          <li>Screenshot the <b>receipt</b> (make sure the reference number is visible).</li>
-          <li>Fill out the form below and submit the screenshot.</li>
-          <li>I'll approve it — usually <b>within 24 hours</b>. You'll get an email once it's active.</li>
-        </ol>
+      <div class="chips" id="chips"></div>
+      <div class="grid" id="grid"><div class="empty">Loading products...</div></div>
 
-        <div id="payMsg" class="msg hide"></div>
+      <!-- UPGRADE -->
+      <div id="upgradeSection" class="hide">
+        <h2 class="section-title" id="upTitle">Upgrade for More</h2>
+        <div class="plans" id="plans"></div>
 
-        <form id="payForm">
-          <div class="row2">
-            <div class="field">
-              <label for="pTier">Plan Paid For</label>
-              <select id="pTier" required></select>
+        <div class="gcash-box">
+          <h3>How to Pay via GCash</h3>
+          <div class="gcash-num">
+            <div>
+              <div class="big" id="gcNum">0917 123 4567</div>
+              <div class="nm">Name: <b id="gcName">JUAN D.</b></div>
+            </div>
+            <div class="spacer"></div>
+            <button class="btn ghost sm" id="copyNum">Copy Number</button>
+          </div>
+          <img id="gcQr" class="hide" alt="GCash QR" style="max-width:220px;border-radius:12px;margin-bottom:16px">
+
+          <ol class="steps">
+            <li>Open the GCash app → <b>Send Money</b> → enter the number above.</li>
+            <li>Send the exact amount for the plan you want.</li>
+            <li>Screenshot the <b>receipt</b> (make sure the reference number is visible).</li>
+            <li>Fill out the form below and submit the screenshot.</li>
+            <li>I'll approve it — usually <b>within 24 hours</b>. You'll get an email once it's active.</li>
+          </ol>
+
+          <div id="payMsg" class="msg hide"></div>
+
+          <form id="payForm">
+            <div class="row2">
+              <div class="field">
+                <label for="pTier">Plan Paid For</label>
+                <select id="pTier" required></select>
+              </div>
+              <div class="field">
+                <label for="pAmt">Amount Sent (₱)</label>
+                <input type="number" id="pAmt" step="0.01" min="1" placeholder="2500" required>
+              </div>
             </div>
             <div class="field">
-              <label for="pAmt">Amount Sent (₱)</label>
-              <input type="number" id="pAmt" step="0.01" min="1" placeholder="2500" required>
+              <label for="pRef">GCash Reference Number</label>
+              <input type="text" id="pRef" placeholder="e.g. 1029384756XYZ" required>
             </div>
+            <div class="field">
+              <label for="pFile">Receipt Screenshot</label>
+              <input type="file" id="pFile" accept="image/*" required>
+              <div class="hint">JPG or PNG, up to 5 MB.</div>
+            </div>
+            <button type="submit" class="btn" id="payBtn">Submit Proof of Payment</button>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ MY DOWNLOADS ═══════ -->
+    <section id="view-downloads" class="hide">
+      <h2 class="section-title">My Downloads</h2>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Date</th><th>Product</th><th>Type</th><th>Category</th></tr></thead>
+        <tbody id="dlBody"><tr><td colspan="4" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+
+    <!-- ═══════ SUGGEST A PRODUCT ═══════ -->
+    <section id="view-suggest" class="hide">
+      <h2 class="section-title">Suggest a Product</h2>
+      <div class="gcash-box">
+        <p style="color:var(--muted);font-size:13.5px;margin-bottom:18px;line-height:1.6">Looking for something we don't have yet? Tell us what you'd like to see — we read every suggestion.</p>
+        <div id="suggestMsg" class="msg hide"></div>
+        <form id="suggestForm">
+          <div class="field">
+            <label for="sTitle">Product Title / Idea</label>
+            <input type="text" id="sTitle" placeholder="e.g. Canva templates for online sellers" required>
           </div>
           <div class="field">
-            <label for="pRef">GCash Reference Number</label>
-            <input type="text" id="pRef" placeholder="e.g. 1029384756XYZ" required>
+            <label for="sDetails">Details (optional)</label>
+            <textarea id="sDetails" placeholder="Tell us more about what you're looking for."></textarea>
           </div>
-          <div class="field">
-            <label for="pFile">Receipt Screenshot</label>
-            <input type="file" id="pFile" accept="image/*" required>
-            <div class="hint">JPG or PNG, up to 5 MB.</div>
-          </div>
-          <button type="submit" class="btn" id="payBtn">Submit Proof of Payment</button>
+          <button type="submit" class="btn" id="sBtn">Submit Suggestion</button>
         </form>
       </div>
-    </div>
+
+      <h2 class="section-title">Your Suggestions</h2>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Date</th><th>Title</th><th>Status</th></tr></thead>
+        <tbody id="suggestBody"><tr><td colspan="3" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+
+    <!-- ═══════ REFER A FRIEND ═══════ -->
+    <section id="view-refer" class="hide">
+      <h2 class="section-title">Refer a Friend</h2>
+      <div class="gcash-box">
+        <p style="color:var(--muted);font-size:13.5px;margin-bottom:18px;line-height:1.6">Share your personal link with friends. When someone signs up using it, they'll be linked to your account below.</p>
+        <div class="gcash-num">
+          <div style="flex:1;min-width:200px">
+            <input type="text" id="refLink" readonly style="width:100%;padding:11px 14px;background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:9px">
+          </div>
+          <button class="btn ghost sm" id="copyRefLink">Copy Link</button>
+        </div>
+        <div class="stats" style="grid-template-columns:1fr;margin-bottom:0">
+          <div class="stat"><div class="n" id="refCount">0</div><div class="l">Friends Joined via Your Link</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════ FAQ ═══════ -->
+    <section id="view-faq" class="hide">
+      <h2 class="section-title">FAQ</h2>
+      <div id="faqList" class="faq-list"></div>
+    </section>
   </main>
 
   <footer>
@@ -154,7 +223,7 @@
   </footer>
 </div>
 
-<script src="config.js?v=6"></script>
+<script src="config.js?v=7"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -163,6 +232,7 @@ const $ = id => document.getElementById(id);
 const TIER = { free:1, premium:2, vip:3 };
 const esc = s => String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;")
   .replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;");
+const fmtDate = d => d ? new Date(d).toLocaleDateString("en-PH",{year:"numeric",month:"short",day:"numeric"}) : "—";
 
 const ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>';
 const ICON_WARN = '<svg class="empty-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 9v5"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>';
@@ -203,6 +273,18 @@ let mode = "login";
 let profile = null;
 let products = [];
 let state = { cat:"all", type:"all", q:"", sort:"new" };
+
+/* ─────── VIEW NAV ─────── */
+const VIEWS = ["browse","downloads","suggest","refer","faq"];
+document.querySelectorAll("#viewNav [data-view]").forEach(b => {
+  b.onclick = () => {
+    document.querySelectorAll("#viewNav [data-view]").forEach(x => x.classList.remove("on"));
+    b.classList.add("on");
+    VIEWS.forEach(v => $("view-" + v).classList.toggle("hide", v !== b.dataset.view));
+    if (b.dataset.view === "downloads") loadDownloadHistory();
+    if (b.dataset.view === "suggest") loadSuggestions();
+  };
+});
 
 /* ─────── AUTH UI ─────── */
 function setMode(m){
@@ -246,9 +328,10 @@ $("authForm").addEventListener("submit", async e => {
 
   try {
     if (mode === "signup") {
+      const ref = new URLSearchParams(location.search).get("ref");
       const { data, error } = await sb.auth.signUp({
         email, password,
-        options: { data: { full_name: $("fname").value.trim() } }
+        options: { data: { full_name: $("fname").value.trim(), ref: ref || undefined } }
       });
       if (error) throw error;
       if (!data.session) {
@@ -321,6 +404,8 @@ async function boot(){
 
   await Promise.all([loadProducts(), loadPayStatus(), loadDlCount()]);
   buildUpgrade();
+  setupReferral();
+  renderFAQ();
 }
 
 /* ─────── PRODUCTS ─────── */
@@ -450,6 +535,103 @@ async function download(btn){
 async function loadDlCount(){
   const { count } = await sb.from("downloads").select("*", { count:"exact", head:true });
   $("sDl").textContent = count ?? 0;
+}
+
+/* ─────── MY DOWNLOADS ─────── */
+async function loadDownloadHistory(){
+  const { data, error } = await sb.from("downloads")
+    .select("created_at, products(title, kind, category)")
+    .order("created_at", { ascending:false });
+
+  if (error) {
+    $("dlBody").innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:30px">' +
+      esc(error.message) + "</td></tr>";
+    return;
+  }
+  if (!data || !data.length) {
+    $("dlBody").innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--muted);padding:30px">' +
+      "You haven't downloaded anything yet.</td></tr>";
+    return;
+  }
+  $("dlBody").innerHTML = data.map(r => "<tr>" +
+    "<td>" + fmtDate(r.created_at) + "</td>" +
+    "<td><b>" + esc(r.products?.title || "Deleted product") + "</b></td>" +
+    "<td>" + esc(r.products?.kind || "—") + "</td>" +
+    "<td>" + esc(r.products?.category || "—") + "</td>" +
+    "</tr>").join("");
+}
+
+/* ─────── SUGGEST A PRODUCT ─────── */
+$("suggestForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = $("sBtn");
+  btn.disabled = true;
+  btn.textContent = "Submitting...";
+  hideMsg("suggestMsg");
+  try {
+    const { data:{ user } } = await sb.auth.getUser();
+    const { error } = await sb.from("product_requests").insert({
+      user_id: user.id,
+      title: $("sTitle").value.trim(),
+      details: $("sDetails").value.trim() || null
+    });
+    if (error) throw error;
+    showMsg("suggestMsg", "<b>Thanks!</b> We received your suggestion.", "ok");
+    $("suggestForm").reset();
+    loadSuggestions();
+  } catch(err) {
+    showMsg("suggestMsg", esc(err.message || "Something went wrong."));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Submit Suggestion";
+  }
+});
+
+async function loadSuggestions(){
+  const { data, error } = await sb.from("product_requests")
+    .select("*").order("created_at", { ascending:false });
+
+  if (error) {
+    $("suggestBody").innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:30px">' +
+      esc(error.message) + "</td></tr>";
+    return;
+  }
+  if (!data || !data.length) {
+    $("suggestBody").innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--muted);padding:30px">' +
+      "You haven't suggested anything yet.</td></tr>";
+    return;
+  }
+  $("suggestBody").innerHTML = data.map(r => "<tr>" +
+    "<td>" + fmtDate(r.created_at) + "</td>" +
+    "<td><b>" + esc(r.title) + "</b>" +
+      (r.admin_note ? "<br><small style='color:var(--muted)'>" + esc(r.admin_note) + "</small>" : "") + "</td>" +
+    '<td><span class="st st-' + esc(r.status) + '">' + esc(r.status) + "</span></td>" +
+    "</tr>").join("");
+}
+
+/* ─────── REFER A FRIEND ─────── */
+function setupReferral(){
+  const link = location.origin + location.pathname + "?ref=" + (profile.referral_code || "");
+  $("refLink").value = link;
+  $("copyRefLink").onclick = () => {
+    navigator.clipboard.writeText(link);
+    $("copyRefLink").textContent = "Copied";
+    setTimeout(() => $("copyRefLink").textContent = "Copy Link", 1800);
+  };
+  sb.rpc("my_referral_count").then(({ data, error }) => {
+    if (!error) $("refCount").textContent = data ?? 0;
+  });
+}
+
+/* ─────── FAQ ─────── */
+function renderFAQ(){
+  const list = C.faq || [];
+  if (!list.length) { $("faqList").innerHTML = '<div class="empty">No FAQs yet.</div>'; return; }
+  $("faqList").innerHTML = list.map((f, i) =>
+    '<details class="faq-item"' + (i === 0 ? " open" : "") + ">" +
+      "<summary>" + esc(f.q) + "</summary>" +
+      '<div class="faq-a">' + esc(f.d) + "</div>" +
+    "</details>").join("");
 }
 
 /* ─────── UPGRADE + GCASH ─────── */

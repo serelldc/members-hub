@@ -332,6 +332,136 @@ create policy st_covers_write on storage.objects
 --  c) I-refresh ang admin.html — makakapasok ka na.
 -- ═══════════════════════════════════════════════════════════════
 
+-- ═══════════════════════════════════════════════════════════════
+--  8. PRODUCT SUGGESTIONS — members can request products
+-- ═══════════════════════════════════════════════════════════════
+
+create table if not exists public.product_requests (
+  id          uuid primary key default gen_random_uuid(),
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  title       text not null,
+  details     text,
+  status      text not null default 'new' check (status in ('new','planned','done','declined')),
+  admin_note  text,
+  created_at  timestamptz not null default now()
+);
+
+create index if not exists idx_prodreq_status on public.product_requests(status, created_at desc);
+
+alter table public.product_requests enable row level security;
+
+drop policy if exists prodreq_select on public.product_requests;
+create policy prodreq_select on public.product_requests
+  for select using (user_id = auth.uid() or public.is_admin());
+
+drop policy if exists prodreq_insert_own on public.product_requests;
+create policy prodreq_insert_own on public.product_requests
+  for insert with check (user_id = auth.uid());
+
+drop policy if exists prodreq_admin_update on public.product_requests;
+create policy prodreq_admin_update on public.product_requests
+  for update using (public.is_admin()) with check (public.is_admin());
+
+
+-- ═══════════════════════════════════════════════════════════════
+--  9. REFERRALS
+-- ═══════════════════════════════════════════════════════════════
+
+alter table public.profiles add column if not exists referral_code text;
+alter table public.profiles add column if not exists referred_by   uuid references public.profiles(id);
+
+-- Backfill referral codes for any existing members that don't have one yet
+update public.profiles set referral_code = substr(md5(id::text), 1, 8)
+where referral_code is null;
+
+create unique index if not exists idx_profiles_referral_code on public.profiles(referral_code);
+
+-- Update the new-user trigger so every signup gets a referral code, and
+-- honors a ?ref=CODE passed through signup metadata.
+create or replace function public.handle_new_user()
+returns trigger language plpgsql security definer set search_path = public as $$
+declare ref_id uuid;
+begin
+  if new.raw_user_meta_data->>'ref' is not null then
+    select id into ref_id from public.profiles
+      where referral_code = new.raw_user_meta_data->>'ref' limit 1;
+  end if;
+
+  insert into public.profiles (id, email, full_name, referral_code, referred_by)
+  values (
+    new.id,
+    new.email,
+    coalesce(new.raw_user_meta_data->>'full_name', split_part(new.email, '@', 1)),
+    substr(md5(new.id::text), 1, 8),
+    ref_id
+  )
+  on conflict (id) do nothing;
+  return new;
+end $$;
+
+-- A member can check their OWN referral count without being able to see
+-- other members' profiles (RLS still blocks that).
+create or replace function public.my_referral_count()
+returns bigint language sql stable security definer set search_path = public as $$
+  select count(*) from public.profiles where referred_by = auth.uid();
+$$;
+
+
+-- ═══════════════════════════════════════════════════════════════
+--  10. ANALYTICS (admin only)
+-- ═══════════════════════════════════════════════════════════════
+
+create or replace function public.admin_analytics()
+returns table (
+  total_members       bigint,
+  total_downloads     bigint,
+  total_revenue        numeric,
+  members_this_month  bigint,
+  members_last_month  bigint
+)
+language sql stable security definer set search_path = public as $$
+  select
+    (select count(*) from public.profiles where public.is_admin()),
+    (select count(*) from public.downloads where public.is_admin()),
+    (select coalesce(sum(amount),0) from public.payment_requests where status = 'approved' and public.is_admin()),
+    (select count(*) from public.profiles where created_at >= date_trunc('month', now()) and public.is_admin()),
+    (select count(*) from public.profiles
+       where created_at >= date_trunc('month', now() - interval '1 month')
+         and created_at <  date_trunc('month', now())
+         and public.is_admin());
+$$;
+
+create or replace function public.admin_top_products(limit_n int default 5)
+returns table (product_id uuid, title text, download_count bigint)
+language sql stable security definer set search_path = public as $$
+  select d.product_id, p.title, count(*) as download_count
+  from public.downloads d
+  join public.products p on p.id = d.product_id
+  where public.is_admin()
+  group by d.product_id, p.title
+  order by download_count desc
+  limit limit_n;
+$$;
+
+-- Extend the members RPC with referral info (recreated with new return shape)
+drop function if exists public.admin_list_members();
+create or replace function public.admin_list_members()
+returns table (
+  id uuid, email text, full_name text, tier text,
+  is_admin boolean, expires_at timestamptz, created_at timestamptz,
+  downloads bigint, referral_code text, referral_count bigint
+)
+language sql stable security definer set search_path = public as $$
+  select p.id, p.email, p.full_name, p.tier, p.is_admin, p.expires_at, p.created_at,
+         (select count(*) from public.downloads d where d.user_id = p.id),
+         p.referral_code,
+         (select count(*) from public.profiles r where r.referred_by = p.id)
+  from public.profiles p
+  where public.is_admin()
+  order by p.created_at desc;
+$$;
+
+
 -- Optional: sample products para may makita ka agad
 insert into public.products (title, description, category, kind, tier, cover, external_url, file_size, sort_order)
 select * from (values

@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Admin — Digz Members</title>
-<link rel="stylesheet" href="style.css?v=5">
+<link rel="stylesheet" href="style.css?v=6">
 </head>
 <body>
 
@@ -49,10 +49,16 @@
       <button class="chip on" data-tab="pay">Payments</button>
       <button class="chip" data-tab="prod">Products</button>
       <button class="chip" data-tab="mem">Members</button>
+      <button class="chip" data-tab="sugg">Suggestions</button>
+      <button class="chip" data-tab="analytics">Analytics</button>
     </div>
 
     <!-- ══ PAYMENTS ══ -->
     <section id="tab-pay">
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <div class="spacer"></div>
+        <button class="btn ghost sm" id="expPay">Export CSV</button>
+      </div>
       <div id="payMsg" class="msg hide"></div>
       <div class="tblwrap"><table>
         <thead><tr><th>Date</th><th>Member</th><th>Plan</th><th>Amount</th>
@@ -80,13 +86,40 @@
       <div class="toolbar" style="margin-bottom:14px">
         <div class="search"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
           <input type="search" id="memQ" placeholder="Search members..."></div>
+        <button class="btn ghost sm" id="expMem">Export CSV</button>
       </div>
       <div id="memMsg" class="msg hide"></div>
       <div class="tblwrap"><table>
         <thead><tr><th>Name</th><th>Email</th><th>Tier</th><th>Downloads</th>
-          <th>Joined</th><th>Expires</th><th></th></tr></thead>
-        <tbody id="memBody"><tr><td colspan="7" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
+          <th>Referrals</th><th>Joined</th><th>Expires</th><th></th></tr></thead>
+        <tbody id="memBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
       </table></div>
+    </section>
+
+    <!-- ══ SUGGESTIONS ══ -->
+    <section id="tab-sugg" class="hide">
+      <div id="suggMsg" class="msg hide"></div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Date</th><th>Member</th><th>Title</th><th>Details</th><th>Status</th><th></th></tr></thead>
+        <tbody id="suggBody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+
+    <!-- ══ ANALYTICS ══ -->
+    <section id="tab-analytics" class="hide">
+      <div id="anMsg" class="msg hide"></div>
+      <div class="stats">
+        <div class="stat"><div class="n" id="aRevenue">₱0</div><div class="l">Total Revenue</div></div>
+        <div class="stat"><div class="n" id="aDownloads">0</div><div class="l">Total Downloads</div></div>
+        <div class="stat"><div class="n" id="aThisMonth">0</div><div class="l">New Members This Month</div></div>
+        <div class="stat"><div class="n" id="aLastMonth">0</div><div class="l">New Members Last Month</div></div>
+      </div>
+
+      <h2 class="section-title">Top Products by Downloads</h2>
+      <div id="topProdList" class="bar-list"></div>
+
+      <h2 class="section-title">Referral Leaderboard</h2>
+      <div id="refLeaderList" class="bar-list"></div>
     </section>
   </main>
 </div>
@@ -144,7 +177,7 @@
   </div>
 </div>
 
-<script src="config.js?v=5"></script>
+<script src="config.js?v=7"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -168,7 +201,7 @@ if (C.SUPABASE_URL.includes("YOUR-PROJECT-REF")) {
 }
 const sb = createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY);
 
-let members = [], payments = [], prods = [];
+let members = [], payments = [], prods = [], suggestions = [];
 
 function msg(id, text, kind){
   const e = $(id); e.className = "msg " + (kind||"err"); e.innerHTML = text; e.classList.remove("hide");
@@ -231,9 +264,37 @@ document.querySelectorAll("[data-tab]").forEach(b => {
   b.onclick = () => {
     document.querySelectorAll("[data-tab]").forEach(x => x.classList.remove("on"));
     b.classList.add("on");
-    ["pay","prod","mem"].forEach(t => $("tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
+    ["pay","prod","mem","sugg","analytics"].forEach(t => $("tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
+    if (b.dataset.tab === "sugg") loadSuggestions();
+    if (b.dataset.tab === "analytics") loadAnalytics();
   };
 });
+
+/* ─── CSV EXPORT ─── */
+function toCSV(rows, headers){
+  const q = v => '"' + String(v ?? "").replace(/"/g,'""') + '"';
+  return [headers.map(q).join(",")].concat(rows.map(r => r.map(q).join(","))).join("\r\n");
+}
+function downloadCSV(filename, csv){
+  const blob = new Blob([csv], { type:"text/csv;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+}
+$("expPay").onclick = () => {
+  const rows = payments.map(p => {
+    const m = members.find(x => x.id === p.user_id);
+    return [fmt(p.created_at), m?.full_name || "", m?.email || "", p.requested_tier, p.amount, p.reference || "", p.status];
+  });
+  downloadCSV("payments.csv", toCSV(rows, ["Date","Member","Email","Plan","Amount","Reference","Status"]));
+};
+$("expMem").onclick = () => {
+  const rows = members.map(m => [m.full_name || "", m.email, m.tier, m.downloads,
+    fmt(m.created_at), m.expires_at ? fmt(m.expires_at) : "", m.referral_code || "", m.referral_count ?? 0]);
+  downloadCSV("members.csv", toCSV(rows, ["Name","Email","Tier","Downloads","Joined","Expires","Referral Code","Referrals"]));
+};
 
 async function loadAll(){
   // Members first — the payments table needs their name/email.
@@ -439,7 +500,7 @@ function renderMembers(){
     !q || (m.full_name + " " + m.email).toLowerCase().includes(q));
 
   if (!list.length) {
-    $("memBody").innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:36px">No results found.</td></tr>';
+    $("memBody").innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--muted);padding:36px">No results found.</td></tr>';
     return;
   }
   $("memBody").innerHTML = list.map(m => "<tr>" +
@@ -449,6 +510,7 @@ function renderMembers(){
       ["free","premium","vip"].map(t => '<option value="' + t + '"' + (m.tier === t ? " selected" : "") + ">" + t + "</option>").join("") +
     "</select></td>" +
     "<td>" + m.downloads + "</td>" +
+    "<td>" + (m.referral_count || 0) + "</td>" +
     "<td>" + fmt(m.created_at) + "</td>" +
     "<td>" + (m.expires_at ? fmt(m.expires_at) : "<span style='color:var(--muted)'>no expiry</span>") + "</td>" +
     '<td class="actions"><button class="btn ghost sm" data-exp="' + m.id + '">Set Expiry</button></td></tr>').join("");
@@ -476,6 +538,94 @@ function renderMembers(){
       loadMembers();
     };
   });
+}
+
+/* ═══ SUGGESTIONS ═══ */
+async function loadSuggestions(){
+  const { data, error } = await sb.from("product_requests")
+    .select("*").order("created_at", { ascending:false });
+  if (error) return msg("suggMsg", esc(error.message));
+  suggestions = data || [];
+  renderSuggestions();
+}
+
+function renderSuggestions(){
+  if (!suggestions.length) {
+    $("suggBody").innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:36px">No suggestions yet.</td></tr>';
+    return;
+  }
+  $("suggBody").innerHTML = suggestions.map(r => {
+    const m = members.find(x => x.id === r.user_id);
+    return "<tr>" +
+      "<td>" + fmt(r.created_at) + "</td>" +
+      "<td><b>" + esc(m?.full_name || "—") + "</b><br><small style='color:var(--muted)'>" +
+        esc(m?.email || r.user_id.slice(0,8)) + "</small></td>" +
+      "<td><b>" + esc(r.title) + "</b></td>" +
+      "<td style='max-width:240px;white-space:normal'>" + esc(r.details || "—") +
+        (r.admin_note ? "<br><small style='color:var(--muted)'>Note: " + esc(r.admin_note) + "</small>" : "") + "</td>" +
+      '<td><select data-sugg="' + r.id + '" style="background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:8px;padding:6px 9px">' +
+        ["new","planned","done","declined"].map(s => '<option value="' + s + '"' + (r.status === s ? " selected" : "") + ">" + s + "</option>").join("") +
+      "</select></td>" +
+      '<td class="actions"><button class="btn ghost sm" data-note="' + r.id + '">Note</button></td></tr>';
+  }).join("");
+
+  $("suggBody").querySelectorAll("[data-sugg]").forEach(s => {
+    s.onchange = async () => {
+      const { error } = await sb.from("product_requests").update({ status: s.value }).eq("id", s.dataset.sugg);
+      if (error) return msg("suggMsg", esc(error.message));
+      msg("suggMsg", "Status updated.", "ok");
+      loadSuggestions();
+    };
+  });
+  $("suggBody").querySelectorAll("[data-note]").forEach(b => {
+    b.onclick = async () => {
+      const r = suggestions.find(x => x.id === b.dataset.note);
+      const note = prompt("Note for this suggestion (the member will see this):", r.admin_note || "");
+      if (note === null) return;
+      const { error } = await sb.from("product_requests").update({ admin_note: note }).eq("id", r.id);
+      if (error) return msg("suggMsg", esc(error.message));
+      msg("suggMsg", "Note saved.", "ok");
+      loadSuggestions();
+    };
+  });
+}
+
+/* ═══ ANALYTICS ═══ */
+async function loadAnalytics(){
+  const [{ data: an, error: e1 }, { data: top, error: e2 }] = await Promise.all([
+    sb.rpc("admin_analytics"),
+    sb.rpc("admin_top_products", { limit_n: 5 })
+  ]);
+  if (e1) return msg("anMsg", esc(e1.message));
+  const a = an?.[0];
+  if (a) {
+    $("aRevenue").textContent = "₱" + Number(a.total_revenue || 0).toLocaleString("en-PH");
+    $("aDownloads").textContent = a.total_downloads ?? 0;
+    $("aThisMonth").textContent = a.members_this_month ?? 0;
+    $("aLastMonth").textContent = a.members_last_month ?? 0;
+  }
+  if (!e2 && top) renderBarList("topProdList", top.map(t => ({ label: t.title, value: Number(t.download_count) })));
+  else renderBarList("topProdList", []);
+  renderReferralLeaderboard();
+}
+
+function renderBarList(elId, rows){
+  const el = $(elId);
+  if (!rows.length) { el.innerHTML = '<div class="empty">No data yet.</div>'; return; }
+  const max = Math.max(...rows.map(r => r.value), 1);
+  el.innerHTML = rows.map(r =>
+    '<div class="bar-row"><div class="bar-label">' + esc(r.label) + "</div>" +
+    '<div class="bar-track"><div class="bar-fill" style="width:' + Math.round(r.value / max * 100) + '%"></div></div>' +
+    '<div class="bar-val">' + r.value + "</div></div>").join("");
+}
+
+function renderReferralLeaderboard(){
+  const rows = members
+    .filter(m => Number(m.referral_count) > 0)
+    .sort((a,b) => b.referral_count - a.referral_count)
+    .slice(0, 5)
+    .map(m => ({ label: m.full_name || m.email, value: Number(m.referral_count) }));
+  renderBarList("refLeaderList", rows);
 }
 </script>
 </body>
