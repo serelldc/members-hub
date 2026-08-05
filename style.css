@@ -1,7 +1,7 @@
 :root{
   --bg:#0a0a0c; --bg2:#111214; --card:#141517; --card2:#1a1b1e;
   --line:rgba(255,255,255,.08); --line-hi:rgba(255,255,255,.18);
-  --txt:#f2f3f5; --muted:#8a8d93;
+  --txt:#f2f3f5; --muted:#9b9ea5;
   --accent:#5b90f5; --accent-dim:rgba(91,144,245,.14);
   --gold:#c9a24b; --gold-dim:rgba(201,162,75,.14);
   --ok:#34d399; --warn:#e8a33d; --danger:#ef5350;
@@ -10,10 +10,10 @@
 html[data-theme="light"]{
   --bg:#f4f5f7; --bg2:#e9eaed; --card:#ffffff; --card2:#f2f3f5;
   --line:rgba(0,0,0,.10); --line-hi:rgba(0,0,0,.20);
-  --txt:#16171a; --muted:#5c5f66;
+  --txt:#16171a; --muted:#4b4e55;
   --accent:#3b6fe0; --accent-dim:rgba(59,111,224,.10);
-  --gold:#96731f; --gold-dim:rgba(150,115,31,.10);
-  --ok:#0f9d68; --warn:#b0700a; --danger:#d6433e;
+  --gold:#7d5e19; --gold-dim:rgba(125,94,25,.10);
+  --ok:#0b7d54; --warn:#96600a; --danger:#b8342f;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 body{
@@ -35,7 +35,7 @@ svg{display:block}
 .auth-wrap{position:relative;z-index:1;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 .auth-box{width:100%;max-width:410px;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:36px 30px;box-shadow:0 30px 70px rgba(0,0,0,.5);position:relative}
 .brand-mark{display:flex;justify-content:center;margin-bottom:24px}
-.brand-mark img{height:68px;width:auto;display:block}
+.brand-mark img{height:96px;width:auto;max-width:100%;display:block}
 .auth-box h1{font-size:20px;font-weight:700;text-align:center;margin-bottom:6px;letter-spacing:-.3px}
 .auth-box .sub{text-align:center;color:var(--muted);font-size:13.5px;margin-bottom:26px;line-height:1.5}
 .tabs{display:flex;gap:4px;background:var(--bg2);padding:4px;border-radius:9px;margin-bottom:22px;border:1px solid var(--line)}
@@ -62,7 +62,7 @@ svg{display:block}
 .btn.ghost{background:transparent;border:1px solid var(--line);color:var(--muted)}
 .btn.ghost:hover{color:var(--txt);border-color:var(--line-hi);filter:none}
 .btn.ok{background:#1f8f66;color:#fff}
-.btn.bad{background:transparent;border:1px solid rgba(239,83,80,.35);color:#f2a6a3}
+.btn.bad{background:transparent;border:1px solid rgba(239,83,80,.4);color:var(--danger)}
 .btn.sm{padding:7px 12px;font-size:12.5px;border-radius:7px}
 .btn svg{width:14px;height:14px;flex-shrink:0}
 
@@ -73,15 +73,15 @@ svg{display:block}
 .auth-box .theme-toggle{position:absolute;top:16px;right:16px}
 
 .msg{padding:11px 14px;border-radius:8px;font-size:13.5px;margin-bottom:14px;line-height:1.55;border:1px solid transparent}
-.msg.err{background:rgba(239,83,80,.07);border-color:rgba(239,83,80,.24);color:#f2a6a3}
-.msg.ok{background:rgba(52,211,153,.07);border-color:rgba(52,211,153,.24);color:#7bdcb5}
-.msg.warn{background:rgba(232,163,61,.07);border-color:rgba(232,163,61,.24);color:#e8c07e}
+.msg.err{background:rgba(239,83,80,.09);border-color:rgba(239,83,80,.3);color:var(--danger)}
+.msg.ok{background:rgba(52,211,153,.09);border-color:rgba(52,211,153,.3);color:var(--ok)}
+.msg.warn{background:rgba(232,163,61,.09);border-color:rgba(232,163,61,.3);color:var(--warn)}
 
 /* ─── TOPBAR ─── */
 .topbar{position:sticky;top:0;z-index:50;background:rgba(10,10,12,.85);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
 .topbar-in{max-width:1180px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px}
 .logo{display:flex;align-items:center;gap:9px;text-decoration:none;color:var(--txt)}
-.logo img{height:34px;width:auto;display:block}
+.logo img{height:42px;width:auto;display:block}
 .logo-tag{font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:5px;padding:3px 7px}
 .spacer{flex:1}
 .who{display:flex;align-items:center;gap:9px;font-size:13.5px}
@@ -186,13 +186,13 @@ tbody tr:hover{background:rgba(255,255,255,.015)}
 td.actions{white-space:nowrap;display:flex;gap:6px}
 .mini-mono{width:32px;height:32px;border-radius:7px;background:linear-gradient(160deg,#161d29,#0e131b);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:rgba(255,255,255,.82)}
 .st{font-size:10px;font-weight:700;padding:3px 9px;border-radius:6px;text-transform:uppercase;letter-spacing:.4px;border:1px solid transparent;display:inline-block}
-.st-pending{background:transparent;border-color:rgba(232,163,61,.4);color:#e8c07e}
-.st-approved{background:transparent;border-color:rgba(52,211,153,.4);color:#7bdcb5}
-.st-rejected{background:transparent;border-color:rgba(239,83,80,.4);color:#f2a6a3}
-.st-new{background:transparent;border-color:rgba(91,144,245,.4);color:#9db8f5}
-.st-planned{background:transparent;border-color:rgba(232,163,61,.4);color:#e8c07e}
-.st-done{background:transparent;border-color:rgba(52,211,153,.4);color:#7bdcb5}
-.st-declined{background:transparent;border-color:rgba(239,83,80,.4);color:#f2a6a3}
+.st-pending{background:transparent;border-color:rgba(232,163,61,.5);color:var(--warn)}
+.st-approved{background:transparent;border-color:rgba(52,211,153,.5);color:var(--ok)}
+.st-rejected{background:transparent;border-color:rgba(239,83,80,.5);color:var(--danger)}
+.st-new{background:transparent;border-color:rgba(91,144,245,.5);color:var(--accent)}
+.st-planned{background:transparent;border-color:rgba(232,163,61,.5);color:var(--warn)}
+.st-done{background:transparent;border-color:rgba(52,211,153,.5);color:var(--ok)}
+.st-declined{background:transparent;border-color:rgba(239,83,80,.5);color:var(--danger)}
 .src{font-size:12.5px;color:var(--muted)}
 .src.on{color:var(--txt)}
 .src.off{color:var(--danger)}
@@ -233,7 +233,7 @@ td.actions{white-space:nowrap;display:flex;gap:6px}
 
 footer{border-top:1px solid var(--line);margin-top:56px;padding:24px 22px;text-align:center;color:var(--muted);font-size:12.5px;line-height:1.8;position:relative;z-index:1}
 footer a{text-decoration:none}
-footer .flogo{height:22px;width:auto;opacity:.5;margin-bottom:10px}
+footer .flogo{height:32px;width:auto;opacity:.65;margin-bottom:10px}
 
 @media(max-width:720px){
   .stats{grid-template-columns:repeat(2,1fr)}
@@ -242,6 +242,8 @@ footer .flogo{height:22px;width:auto;opacity:.5;margin-bottom:10px}
   main{padding:20px 15px 60px}
   .topbar-in{padding:11px 15px}
   .row2{grid-template-columns:1fr}
+  .logo img{height:38px}
+  .brand-mark img{height:76px}
 }
 
 /* ─── ANIMATIONS ─── */
