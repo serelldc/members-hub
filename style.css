@@ -145,12 +145,36 @@ main{max-width:1180px;margin:0 auto;padding:26px 22px 80px;position:relative;z-i
 .card-body p{font-size:13px;color:var(--muted);line-height:1.55;flex:1;margin-bottom:13px}
 .meta{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:13px}
 .pill{font-size:9.5px;font-weight:600;padding:3px 8px;border-radius:5px;background:transparent;border:1px solid var(--line);color:var(--muted);text-transform:uppercase;letter-spacing:.3px}
-.dl{width:100%;padding:10px;border-radius:8px;font-weight:600;font-size:13.5px;background:var(--accent);color:#fff;display:flex;align-items:center;justify-content:center;gap:7px;transition:filter .15s}
+/* Download button — morphs into a spinning loader circle on hover.
+   Adapted from a Uiverse.io concept by Tsiangana, re-themed to use our
+   accent color and CSS variables so it matches dark/light mode. */
+.dl{
+  position:relative; overflow:visible;
+  width:100%; height:38px; padding:10px; border-radius:19px;
+  font-weight:600; font-size:13.5px;
+  background:var(--accent); color:#fff;
+  display:flex; align-items:center; justify-content:center; gap:7px;
+  box-shadow:1px 1px 0 var(--accent-dim);
+  transition:width .4s cubic-bezier(.4,0,.2,1), height .4s cubic-bezier(.4,0,.2,1),
+    border-radius .4s cubic-bezier(.4,0,.2,1), filter .15s;
+}
 .dl:hover{filter:brightness(1.08)}
-.dl.locked{background:var(--card2);color:var(--muted);border:1px solid var(--line)}
-.dl svg{width:16px;height:16px;flex-shrink:0;animation:dlBounce 1.8s ease-in-out infinite}
-.dl:hover svg{animation-duration:.7s}
-.dl.locked svg{animation:none}
+.dl.locked{background:var(--card2);color:var(--muted);border:1px solid var(--line);box-shadow:none}
+.dl svg{width:16px;height:16px;flex-shrink:0;display:none;position:relative;z-index:1}
+.dl:not(.locked):hover{width:38px;height:38px;padding:0;border-radius:50%;margin:0 auto}
+.dl:not(.locked):hover span{display:none}
+.dl:not(.locked):hover svg{display:block}
+.dl:not(.locked):hover::before{
+  content:""; position:absolute; inset:-4px;
+  border:3px solid transparent; border-top-color:#fff; border-right-color:#fff;
+  border-radius:50%; animation:dlSpin 1.3s linear infinite;
+}
+.dl:not(.locked):hover::after{
+  content:""; position:absolute; left:50%; top:50%;
+  width:3px; height:9px; margin-left:-1.5px;
+  background:rgba(255,255,255,.85); border-radius:2px;
+  animation:dlDrip .9s linear infinite;
+}
 
 .empty{grid-column:1/-1;text-align:center;padding:50px 20px;color:var(--muted);background:var(--card);border:1px dashed var(--line);border-radius:var(--radius);line-height:1.6}
 .empty .big{font-size:32px;margin-bottom:10px}
@@ -259,11 +283,18 @@ footer .flogo{height:32px;width:auto;opacity:.65;margin-bottom:10px}
   from{opacity:0; transform:translateY(10px) scale(.98)}
   to{opacity:1; transform:translateY(0) scale(1)}
 }
-@keyframes dlBounce{
-  0%,100%{transform:translateY(0)}
-  50%{transform:translateY(3px)}
+@keyframes dlSpin{
+  to{transform:rotate(360deg)}
+}
+@keyframes dlDrip{
+  0%{transform:translateY(-9px);opacity:0}
+  50%{opacity:1}
+  100%{transform:translateY(8px);opacity:0}
 }
 
 @media (prefers-reduced-motion: reduce){
-  .hero, .hero h2, .hero p, .card, .dl svg{animation:none !important}
+  .hero, .hero h2, .hero p, .card, .dl::before, .dl::after{animation:none !important}
+  .dl:not(.locked):hover{width:100%;height:38px;border-radius:19px;padding:10px}
+  .dl:not(.locked):hover span{display:inline}
+  .dl:not(.locked):hover svg{display:none}
 }
