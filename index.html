@@ -10,7 +10,7 @@
 </head>
 <body>
 
-<!-- ═══════════════ AUTH ═══════════════ -->
+<!-- ══════════════ AUTH ══════════════ -->
 <div id="authView" class="auth-wrap hide">
   <div class="auth-box">
     <button class="theme-toggle" id="themeToggleAuth" title="Switch light / dark mode" aria-label="Switch light / dark mode"></button>
@@ -79,6 +79,7 @@
       <button class="chip on" data-view="browse">Browse Products</button>
       <button class="chip" data-view="downloads">My Downloads</button>
       <button class="chip" data-view="suggest">Suggest a Product</button>
+      <button class="chip" data-view="invite">Invite &amp; Earn</button>
       <button class="chip" data-view="refer">Refer a Friend</button>
       <button class="chip" data-view="faq">FAQ</button>
     </div>
@@ -195,6 +196,12 @@
       </table></div>
     </section>
 
+    <!-- ═══════ INVITE & EARN ═══════ -->
+    <section id="view-invite" class="hide">
+      <h2 class="section-title">Invite &amp; Earn</h2>
+      <div id="inviteBox" class="gcash-box">Loading...</div>
+    </section>
+
     <!-- ═══════ REFER A FRIEND ═══════ -->
     <section id="view-refer" class="hide">
       <h2 class="section-title">Refer a Friend</h2>
@@ -215,7 +222,7 @@
   </footer>
 </div>
 
-<script src="config.js?v=8"></script>
+<script src="config.js?v=9"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -282,8 +289,13 @@ let profile = null;
 let products = [];
 let state = { cat:"all", type:"all", q:"", sort:"new" };
 
+// Captured once on page load, before the ?ref= query string is ever
+// cleared/navigated away from — used to credit whoever invited this
+// new signup (see "Invite & Earn").
+const inviteRef = new URLSearchParams(location.search).get("ref");
+
 /* ─────── VIEW NAV ─────── */
-const VIEWS = ["browse","downloads","suggest","refer","faq"];
+const VIEWS = ["browse","downloads","suggest","invite","refer","faq"];
 document.querySelectorAll("#viewNav [data-view]").forEach(b => {
   b.onclick = () => {
     document.querySelectorAll("#viewNav [data-view]").forEach(x => x.classList.remove("on"));
@@ -291,6 +303,7 @@ document.querySelectorAll("#viewNav [data-view]").forEach(b => {
     VIEWS.forEach(v => $("view-" + v).classList.toggle("hide", v !== b.dataset.view));
     if (b.dataset.view === "downloads") loadDownloadHistory();
     if (b.dataset.view === "suggest") loadSuggestions();
+    if (b.dataset.view === "invite") setupInvite();
   };
 });
 
@@ -336,9 +349,11 @@ $("authForm").addEventListener("submit", async e => {
 
   try {
     if (mode === "signup") {
+      const meta = { full_name: $("fname").value.trim() };
+      if (inviteRef) meta.ref = inviteRef;
       const { data, error } = await sb.auth.signUp({
         email, password,
-        options: { data: { full_name: $("fname").value.trim() } }
+        options: { data: meta }
       });
       if (error) throw error;
       if (!data.session) {
@@ -614,6 +629,51 @@ async function loadSuggestions(){
       (r.admin_note ? "<br><small style='color:var(--muted)'>" + esc(r.admin_note) + "</small>" : "") + "</td>" +
     '<td><span class="st st-' + esc(r.status) + '">' + esc(r.status) + "</span></td>" +
     "</tr>").join("");
+}
+
+/* ─────── INVITE & EARN ─────── */
+// Every member already has a unique referral_code (auto-generated at
+// signup). This link is the hub's OWN invite link — separate from the
+// Systeme.io "Refer a Friend" link below. When someone signs up through
+// it and their ₱2,500 membership payment gets approved, ₱500 is
+// automatically credited here (see approve_payment() in schema.sql).
+async function setupInvite(){
+  const box = $("inviteBox");
+  const link = location.origin + location.pathname + "?ref=" + encodeURIComponent(profile.referral_code || "");
+
+  const [{ data: countData }, { data: earnings, error: eErr }] = await Promise.all([
+    sb.rpc("my_referral_count"),
+    sb.from("referral_earnings").select("*").order("created_at", { ascending:false })
+  ]);
+  const referred = countData ?? 0;
+  const rows = earnings || [];
+  const pendingTotal = rows.filter(r => r.status === "pending").reduce((s,r) => s + Number(r.amount), 0);
+  const paidTotal = rows.filter(r => r.status === "paid").reduce((s,r) => s + Number(r.amount), 0);
+
+  box.innerHTML =
+    '<p style="color:var(--muted);font-size:13.5px;margin-bottom:18px;line-height:1.6">' +
+      "Invite friends to join Digz Members. When someone signs up with your link below and their " +
+      "₱2,500 membership payment is approved, you earn <b>₱500</b> — tracked automatically. " +
+      "We'll send your payout via GCash." +
+    "</p>" +
+    '<div class="gcash-num">' +
+      '<div style="flex:1;min-width:200px">' +
+        '<input type="text" id="inviteLink" readonly value="' + esc(link) + '" ' +
+          'style="width:100%;padding:11px 14px;background:var(--bg2);color:var(--txt);border:1px solid var(--line);border-radius:9px">' +
+      "</div>" +
+      '<button class="btn ghost sm" id="copyInviteLink">Copy Link</button>' +
+    "</div>" +
+    '<div class="stats" style="margin-bottom:0">' +
+      '<div class="stat"><div class="n">' + referred + '</div><div class="l">Friends Invited</div></div>' +
+      '<div class="stat"><div class="n">₱' + pendingTotal.toLocaleString("en-PH") + '</div><div class="l">Pending Payout</div></div>' +
+      '<div class="stat"><div class="n">₱' + paidTotal.toLocaleString("en-PH") + '</div><div class="l">Already Paid</div></div>' +
+    "</div>";
+
+  $("copyInviteLink").onclick = () => {
+    navigator.clipboard.writeText(link);
+    $("copyInviteLink").textContent = "Copied";
+    setTimeout(() => $("copyInviteLink").textContent = "Copy Link", 1800);
+  };
 }
 
 /* ─────── REFER A FRIEND ─────── */
