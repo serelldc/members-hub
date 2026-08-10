@@ -1,7 +1,7 @@
 /* ══════════════════════════════════════════════════════════════════════
    CONFIG — DITO LANG ANG EEDITIN MO
    Ginagamit ito ng index.html at admin.html.
-   ═════════════════════════════════════════════════════════════════════ */
+   ══════════════════════════════════════════════════════════════════════ */
 
 window.CFG = {
 
@@ -14,7 +14,7 @@ window.CFG = {
   SUPABASE_ANON_KEY: "sb_publishable_Ldp9KQGQBGCNvhU-M7yZgA_CRfwSR-i",
 
 
-  /* ── 2. BRANDING ───────────────────────────────────────────────── */
+  /* ── 2. BRANDING ──────────────────────────────────────────────── */
   brandName: "Digz Members",
   initial:   "D",
   tagline:   "DIGZ = Digital Innovators & Growth Zone.",
@@ -83,7 +83,9 @@ window.CFG = {
     { q: "Can I share my account or the files with someone else?",
       d: "No — access is for your personal use only. Please don't share your login or redistribute the files." },
     { q: "How does \"Invite & Earn\" work?",
-      d: "Go to the \"Invite & Earn\" tab to get your personal invite link. When someone signs up using your link and their ₱2,500 membership payment is approved, you earn ₱500 — tracked automatically on that tab. We'll send your payout via GCash." }
+      d: "Go to the \"Invite & Earn\" tab to get your personal invite link. When someone signs up using your link and their ₱2,500 membership payment is approved, you earn ₱500 — tracked automatically on that tab. We'll send your payout via GCash." },
+    { q: "What's in the \"Resources\" tab?",
+      d: "A curated list of useful links and tools for making ebooks, templates, and other digital products — things like design tools, writing helpers, and more. Filter by category using the chips at the top." }
   ],
 
 
