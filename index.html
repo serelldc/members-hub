@@ -75,6 +75,11 @@
     <div id="announce" class="msg warn hide"></div>
     <div id="payStatus" class="msg hide"></div>
 
+    <!-- ═══════ AD BANNER ═══════ -->
+    <div id="adBanner" class="hide" style="margin-bottom:20px">
+      <img id="adImg" src="" alt="Promo" style="width:100%;max-height:520px;object-fit:contain;border-radius:14px;display:block;background:var(--bg2)">
+    </div>
+
     <div class="chips" id="viewNav">
       <button class="chip on" data-view="browse">Browse Products</button>
       <button class="chip" data-view="downloads">My Downloads</button>
@@ -434,10 +439,22 @@ async function boot(){
 
   if (C.announcement) showMsg("announce", C.announcement, "warn");
 
-  await Promise.all([loadProducts(), loadPayStatus(), loadDlCount()]);
+  await Promise.all([loadProducts(), loadPayStatus(), loadDlCount(), loadAd()]);
   buildUpgrade();
   setupReferral();
   renderFAQ();
+}
+
+/* ─────── AD BANNER ─────── */
+// Admin-managed dashboard poster — isang row lang palagi (see admin.html).
+// Walang lalabas kung walang naka-upload na poster.
+async function loadAd(){
+  const { data, error } = await sb.from("ads")
+    .select("*").order("created_at", { ascending:false }).limit(1);
+  if (error || !data || !data.length) return;
+  const { data: urlData } = sb.storage.from("ads").getPublicUrl(data[0].image_path);
+  $("adImg").src = urlData.publicUrl;
+  $("adBanner").classList.remove("hide");
 }
 
 /* ─────── PRODUCTS ─────── */
