@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Admin — Digz Members</title>
-<link rel="stylesheet" href="style.css?v=9">
+<link rel="stylesheet" href="style.css?v=10">
 <script>(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light");}catch(e){}})();</script>
 </head>
 <body>
@@ -53,6 +53,7 @@
       <button class="chip" data-tab="prod">Products</button>
       <button class="chip" data-tab="mem">Members</button>
       <button class="chip" data-tab="sugg">Suggestions</button>
+      <button class="chip" data-tab="resources">Resources</button>
       <button class="chip" data-tab="referrals">Referrals</button>
       <button class="chip" data-tab="analytics">Analytics</button>
     </div>
@@ -106,6 +107,19 @@
       <div class="tblwrap"><table>
         <thead><tr><th>Date</th><th>Member</th><th>Title</th><th>Details</th><th>Status</th><th></th></tr></thead>
         <tbody id="suggBody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+
+    <!-- ══ RESOURCES ══ -->
+    <section id="tab-resources" class="hide">
+      <div style="display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap">
+        <button class="btn" id="newRes">+ New Resource</button>
+        <div class="spacer"></div>
+      </div>
+      <div id="resMsg" class="msg hide"></div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Title</th><th>Category</th><th>Link</th><th>Live</th><th></th></tr></thead>
+        <tbody id="resBody"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
       </table></div>
     </section>
 
@@ -197,7 +211,35 @@
   </div>
 </div>
 
-<script src="config.js?v=9"></script>
+<!-- ══ RESOURCE MODAL ══ -->
+<div id="resModal" class="modal hide">
+  <div class="modal-box">
+    <h3 id="rmTitle">New Resource</h3>
+    <div id="rmMsg" class="msg hide"></div>
+    <form id="resForm">
+      <input type="hidden" id="rfId">
+      <div class="field"><label for="rfTitle">Title</label>
+        <input type="text" id="rfTitle" placeholder="e.g. Canva" required></div>
+      <div class="field"><label for="rfUrl">Link (URL)</label>
+        <input type="url" id="rfUrl" placeholder="https://..." required></div>
+      <div class="field"><label for="rfDesc">Description</label>
+        <textarea id="rfDesc" placeholder="Ano ito at paano ito makakatulong sa paggawa ng ebook / digital product."></textarea></div>
+      <div class="field"><label for="rfCat">Category</label>
+        <input type="text" id="rfCat" placeholder="e.g. Design, Writing, AI Tools" required></div>
+      <div class="field">
+        <label style="display:flex;align-items:center;gap:9px;text-transform:none;font-size:14px;color:var(--txt)">
+          <input type="checkbox" id="rfPub" checked style="width:auto;margin:0"> Live (visible to members)
+        </label>
+      </div>
+      <div class="modal-foot">
+        <button type="button" class="btn ghost" id="rmCancel">Cancel</button>
+        <button type="submit" class="btn" id="rmSave">Save</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script src="config.js?v=10"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -317,8 +359,9 @@ document.querySelectorAll("[data-tab]").forEach(b => {
   b.onclick = () => {
     document.querySelectorAll("[data-tab]").forEach(x => x.classList.remove("on"));
     b.classList.add("on");
-    ["pay","prod","mem","sugg","referrals","analytics"].forEach(t => $("tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
+    ["pay","prod","mem","sugg","resources","referrals","analytics"].forEach(t => $("tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
     if (b.dataset.tab === "sugg") loadSuggestions();
+    if (b.dataset.tab === "resources") loadResources();
     if (b.dataset.tab === "referrals") loadReferrals();
     if (b.dataset.tab === "analytics") loadAnalytics();
   };
@@ -659,6 +702,91 @@ function renderSuggestions(){
     };
   });
 }
+
+/* ═══ RESOURCES (links/tools for members) ═══ */
+let resources = [];
+async function loadResources(){
+  const { data, error } = await sb.from("resources")
+    .select("*").order("category").order("sort_order").order("title");
+  if (error) return msg("resMsg", esc(error.message));
+  resources = data || [];
+  renderResources();
+}
+
+function renderResources(){
+  if (!resources.length) {
+    $("resBody").innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:36px">No resources yet. Click "+ New Resource".</td></tr>';
+    return;
+  }
+  $("resBody").innerHTML = resources.map(r => "<tr>" +
+    "<td><b>" + esc(r.title) + "</b>" + (r.description ? "<br><small style='color:var(--muted)'>" + esc(r.description) + "</small>" : "") + "</td>" +
+    "<td>" + esc(r.category) + "</td>" +
+    "<td><a href='" + esc(r.url) + "' target='_blank' rel='noopener' style='color:var(--muted);font-size:12px'>" +
+      esc(r.url.length > 42 ? r.url.slice(0,42) + "…" : r.url) + "</a></td>" +
+    "<td>" + (r.published ? '<span class="live-dot on">Live</span>' : '<span class="live-dot">Hidden</span>') + "</td>" +
+    '<td class="actions"><button class="btn ghost sm" data-redit="' + r.id + '">Edit</button>' +
+      '<button class="btn bad sm" data-rdel="' + r.id + '">Delete</button></td></tr>'
+  ).join("");
+
+  $("resBody").querySelectorAll("[data-redit]").forEach(b => { b.onclick = () => openResModal(b.dataset.redit); });
+  $("resBody").querySelectorAll("[data-rdel]").forEach(b => {
+    b.onclick = async () => {
+      const r = resources.find(x => x.id === b.dataset.rdel);
+      if (!confirm('Delete "' + r.title + '"? This cannot be undone.')) return;
+      const { error } = await sb.from("resources").delete().eq("id", r.id);
+      if (error) return msg("resMsg", esc(error.message));
+      msg("resMsg", "Resource deleted.", "ok");
+      loadResources();
+    };
+  });
+}
+
+$("newRes").onclick = () => openResModal(null);
+$("rmCancel").onclick = () => $("resModal").classList.add("hide");
+$("resModal").onclick = e => { if (e.target.id === "resModal") $("resModal").classList.add("hide"); };
+
+function openResModal(id){
+  const r = id ? resources.find(x => x.id === id) : null;
+  $("rmTitle").textContent = r ? "Edit Resource" : "New Resource";
+  $("rfId").value    = r?.id || "";
+  $("rfTitle").value = r?.title || "";
+  $("rfUrl").value   = r?.url || "";
+  $("rfDesc").value  = r?.description || "";
+  $("rfCat").value   = r?.category || "";
+  $("rfPub").checked = r ? r.published : true;
+  $("rmMsg").classList.add("hide");
+  $("resModal").classList.remove("hide");
+}
+
+$("resForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = $("rmSave");
+  btn.disabled = true;
+  btn.textContent = "Saving...";
+  try {
+    const id = $("rfId").value;
+    const rec = {
+      title: $("rfTitle").value.trim(),
+      url: $("rfUrl").value.trim(),
+      description: $("rfDesc").value.trim() || null,
+      category: $("rfCat").value.trim() || "General",
+      published: $("rfPub").checked
+    };
+    const { error } = id
+      ? await sb.from("resources").update(rec).eq("id", id)
+      : await sb.from("resources").insert(rec);
+    if (error) throw error;
+
+    $("resModal").classList.add("hide");
+    msg("resMsg", "Resource saved.", "ok");
+    loadResources();
+  } catch(err) {
+    msg("rmMsg", esc(err.message || "Something went wrong."));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Save";
+  }
+});
 
 /* ═══ REFERRALS (Invite & Earn payouts) ═══ */
 let refEarnings = [];
