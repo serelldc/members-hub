@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Digz Members</title>
-<link rel="stylesheet" href="style.css?v=9">
+<link rel="stylesheet" href="style.css?v=10">
 <script>(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light");}catch(e){}})();</script>
 </head>
 <body>
 
-<!-- ══════════════ AUTH ══════════════ -->
+<!-- ═══════════════ AUTH ═══════════════ -->
 <div id="authView" class="auth-wrap hide">
   <div class="auth-box">
     <button class="theme-toggle" id="themeToggleAuth" title="Switch light / dark mode" aria-label="Switch light / dark mode"></button>
@@ -79,6 +79,7 @@
       <button class="chip on" data-view="browse">Browse Products</button>
       <button class="chip" data-view="downloads">My Downloads</button>
       <button class="chip" data-view="suggest">Suggest a Product</button>
+      <button class="chip" data-view="resources">Resources</button>
       <button class="chip" data-view="invite">Invite &amp; Earn</button>
       <button class="chip" data-view="refer">Refer a Friend</button>
       <button class="chip" data-view="faq">FAQ</button>
@@ -196,6 +197,14 @@
       </table></div>
     </section>
 
+    <!-- ═══════ RESOURCES ═══════ -->
+    <section id="view-resources" class="hide">
+      <h2 class="section-title">Resources &amp; Tools</h2>
+      <p style="color:var(--muted);font-size:13.5px;margin-bottom:18px;line-height:1.6">Useful links and tools for making ebooks, templates, and other digital products.</p>
+      <div class="chips" id="resChips"></div>
+      <div class="grid" id="resGrid"><div class="empty">Loading resources...</div></div>
+    </section>
+
     <!-- ═══════ INVITE & EARN ═══════ -->
     <section id="view-invite" class="hide">
       <h2 class="section-title">Invite &amp; Earn</h2>
@@ -222,7 +231,7 @@
   </footer>
 </div>
 
-<script src="config.js?v=9"></script>
+<script src="config.js?v=10"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -295,7 +304,7 @@ let state = { cat:"all", type:"all", q:"", sort:"new" };
 const inviteRef = new URLSearchParams(location.search).get("ref");
 
 /* ─────── VIEW NAV ─────── */
-const VIEWS = ["browse","downloads","suggest","invite","refer","faq"];
+const VIEWS = ["browse","downloads","suggest","resources","invite","refer","faq"];
 document.querySelectorAll("#viewNav [data-view]").forEach(b => {
   b.onclick = () => {
     document.querySelectorAll("#viewNav [data-view]").forEach(x => x.classList.remove("on"));
@@ -303,6 +312,7 @@ document.querySelectorAll("#viewNav [data-view]").forEach(b => {
     VIEWS.forEach(v => $("view-" + v).classList.toggle("hide", v !== b.dataset.view));
     if (b.dataset.view === "downloads") loadDownloadHistory();
     if (b.dataset.view === "suggest") loadSuggestions();
+    if (b.dataset.view === "resources") loadResources();
     if (b.dataset.view === "invite") setupInvite();
   };
 });
@@ -629,6 +639,56 @@ async function loadSuggestions(){
       (r.admin_note ? "<br><small style='color:var(--muted)'>" + esc(r.admin_note) + "</small>" : "") + "</td>" +
     '<td><span class="st st-' + esc(r.status) + '">' + esc(r.status) + "</span></td>" +
     "</tr>").join("");
+}
+
+/* ─────── RESOURCES ─────── */
+// Admin-managed list of external links (ebook/design/writing tools, etc.)
+// Members only ever see rows RLS lets through (published = true).
+let resources = [];
+let resState = { cat: "all" };
+
+async function loadResources(){
+  const { data, error } = await sb.from("resources")
+    .select("*").eq("published", true)
+    .order("category").order("sort_order").order("title");
+
+  if (error) {
+    $("resGrid").innerHTML = '<div class="empty">' + ICON_WARN + 'Could not load resources.<br><small>' +
+      esc(error.message) + '</small></div>';
+    return;
+  }
+  resources = data || [];
+  buildResChips();
+  renderResources();
+}
+
+function buildResChips(){
+  const cats = ["all", ...new Set(resources.map(r => r.category))];
+  $("resChips").innerHTML = cats.map(c =>
+    '<button class="chip' + (c === resState.cat ? " on" : "") + '" data-rcat="' + esc(c) + '">' +
+    (c === "all" ? "All" : esc(c)) + "</button>").join("");
+  $("resChips").querySelectorAll(".chip").forEach(b => {
+    b.onclick = () => { resState.cat = b.dataset.rcat; buildResChips(); renderResources(); };
+  });
+}
+
+function renderResources(){
+  const list = resources.filter(r => resState.cat === "all" || r.category === resState.cat);
+
+  if (!list.length){
+    $("resGrid").innerHTML = '<div class="empty">' + ICON_SEARCH +
+      (resources.length ? "No resources in this category." : "No resources here yet. Check back soon!") + "</div>";
+    return;
+  }
+
+  $("resGrid").innerHTML = list.map(r =>
+    '<article class="card"><div class="card-body">' +
+      "<h3>" + esc(r.title) + "</h3>" +
+      "<p>" + esc(r.description || "") + "</p>" +
+      '<div class="meta"><span class="pill">' + esc(r.category) + "</span></div>" +
+      '<a class="btn full" href="' + esc(r.url) + '" target="_blank" rel="noopener" ' +
+        'style="display:inline-block;text-align:center;text-decoration:none">Visit Link</a>' +
+    "</div></article>").join("");
 }
 
 /* ─────── INVITE & EARN ─────── */
