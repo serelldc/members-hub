@@ -56,6 +56,7 @@
       <button class="chip" data-tab="resources">Resources</button>
       <button class="chip" data-tab="referrals">Referrals</button>
       <button class="chip" data-tab="analytics">Analytics</button>
+      <button class="chip" data-tab="ads">Ads</button>
     </div>
 
     <!-- ══ PAYMENTS ══ -->
@@ -154,6 +155,26 @@
 
       <h2 class="section-title">Top Products by Downloads</h2>
       <div id="topProdList" class="bar-list"></div>
+    </section>
+
+    <!-- ══ ADS ══ -->
+    <section id="tab-ads" class="hide">
+      <p style="color:var(--muted);font-size:13.5px;margin-bottom:16px;line-height:1.6">
+        Ito ang malaking banner/poster na makikita ng members sa taas ng dashboard nila.
+        Isa lang ang aktibo sa isang pagkakataon — kapag nag-upload ka ng bago, awtomatikong
+        mapapalitan ang luma.
+      </p>
+      <div id="adMsg" class="msg hide"></div>
+      <div id="adPreviewWrap" class="hide" style="margin-bottom:16px">
+        <img id="adPreview" src="" alt="" style="max-width:100%;width:420px;max-height:560px;object-fit:contain;border-radius:14px;display:block;border:1px solid var(--line);background:var(--bg2)">
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+        <label class="btn" style="cursor:pointer;margin:0">
+          <span id="adUploadLabel">Upload Poster</span>
+          <input type="file" id="adFile" accept="image/*" style="display:none">
+        </label>
+        <button class="btn bad sm hide" id="adRemove">Remove Poster</button>
+      </div>
     </section>
   </main>
 </div>
@@ -359,11 +380,12 @@ document.querySelectorAll("[data-tab]").forEach(b => {
   b.onclick = () => {
     document.querySelectorAll("[data-tab]").forEach(x => x.classList.remove("on"));
     b.classList.add("on");
-    ["pay","prod","mem","sugg","resources","referrals","analytics"].forEach(t => $("tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
+    ["pay","prod","mem","sugg","resources","referrals","analytics","ads"].forEach(t => $("tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
     if (b.dataset.tab === "sugg") loadSuggestions();
     if (b.dataset.tab === "resources") loadResources();
     if (b.dataset.tab === "referrals") loadReferrals();
     if (b.dataset.tab === "analytics") loadAnalytics();
+    if (b.dataset.tab === "ads") loadAds();
   };
 });
 
@@ -862,6 +884,73 @@ function renderBarList(elId, rows){
     '<div class="bar-track"><div class="bar-fill" style="width:' + Math.round(r.value / max * 100) + '%"></div></div>' +
     '<div class="bar-val">' + r.value + "</div></div>").join("");
 }
+
+/* ═══ ADS (dashboard banner poster) ═══ */
+// Simpleng "current ad" lang — isang row palagi. Pag nag-upload ng bago,
+// tinatanggal ang luma (file + row). Larawan lang, walang clickable link.
+let currentAd = null;
+async function loadAds(){
+  const { data, error } = await sb.from("ads")
+    .select("*").order("created_at", { ascending:false }).limit(1);
+  if (error) return msg("adMsg", esc(error.message));
+  currentAd = data?.[0] || null;
+  renderAd();
+}
+
+function renderAd(){
+  if (!currentAd) {
+    $("adPreviewWrap").classList.add("hide");
+    $("adRemove").classList.add("hide");
+    $("adUploadLabel").textContent = "Upload Poster";
+    return;
+  }
+  const { data } = sb.storage.from("ads").getPublicUrl(currentAd.image_path);
+  $("adPreview").src = data.publicUrl;
+  $("adPreviewWrap").classList.remove("hide");
+  $("adRemove").classList.remove("hide");
+  $("adUploadLabel").textContent = "Replace Poster";
+}
+
+$("adFile").addEventListener("change", async () => {
+  const file = $("adFile").files[0];
+  if (!file) return;
+  if (file.size > 8 * 1024 * 1024) {
+    msg("adMsg", "File is too large (max 8 MB).");
+    $("adFile").value = "";
+    return;
+  }
+  msg("adMsg", "Uploading...", "ok");
+  try {
+    const safe = file.name.replace(/[^\w.\-]+/g, "_");
+    const path = Date.now() + "_" + safe;
+    const { error:upErr } = await sb.storage.from("ads").upload(path, file, { upsert:false });
+    if (upErr) throw upErr;
+
+    const old = currentAd;
+    const { error:insErr } = await sb.from("ads").insert({ image_path: path });
+    if (insErr) throw insErr;
+
+    if (old) {
+      await sb.storage.from("ads").remove([old.image_path]);
+      await sb.from("ads").delete().eq("id", old.id);
+    }
+    msg("adMsg", "Poster updated.", "ok");
+    $("adFile").value = "";
+    loadAds();
+  } catch(err) {
+    msg("adMsg", esc(err.message || "Something went wrong."));
+  }
+});
+
+$("adRemove").onclick = async () => {
+  if (!currentAd) return;
+  if (!confirm("Remove the current poster? Members will no longer see a banner.")) return;
+  const { error } = await sb.from("ads").delete().eq("id", currentAd.id);
+  if (error) return msg("adMsg", esc(error.message));
+  await sb.storage.from("ads").remove([currentAd.image_path]);
+  msg("adMsg", "Poster removed.", "ok");
+  loadAds();
+};
 </script>
 </body>
 </html>
