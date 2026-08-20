@@ -75,9 +75,15 @@
     <div id="announce" class="msg warn hide"></div>
     <div id="payStatus" class="msg hide"></div>
 
-    <!-- ═══════ AD BANNER ═══════ -->
-    <div id="adBanner" class="hide" style="margin-bottom:20px">
-      <img id="adImg" src="" alt="Promo" style="width:100%;max-height:520px;object-fit:contain;border-radius:14px;display:block;background:var(--bg2)">
+    <!-- ═══════ AD BANNERS (3 slots) ═══════ -->
+    <div id="adBanner1" class="hide" style="margin-bottom:20px">
+      <img id="adImg1" src="" alt="Promo" style="width:100%;max-height:520px;object-fit:contain;border-radius:14px;display:block;background:var(--bg2)">
+    </div>
+    <div id="adBanner2" class="hide" style="margin-bottom:20px">
+      <img id="adImg2" src="" alt="Promo" style="width:100%;max-height:520px;object-fit:contain;border-radius:14px;display:block;background:var(--bg2)">
+    </div>
+    <div id="adBanner3" class="hide" style="margin-bottom:20px">
+      <img id="adImg3" src="" alt="Promo" style="width:100%;max-height:520px;object-fit:contain;border-radius:14px;display:block;background:var(--bg2)">
     </div>
 
     <div class="chips" id="viewNav">
@@ -439,22 +445,38 @@ async function boot(){
 
   if (C.announcement) showMsg("announce", C.announcement, "warn");
 
-  await Promise.all([loadProducts(), loadPayStatus(), loadDlCount(), loadAd()]);
+  await Promise.all([loadProducts(), loadPayStatus(), loadDlCount(), loadAds()]);
   buildUpgrade();
   setupReferral();
   renderFAQ();
 }
 
-/* ─────── AD BANNER ─────── */
-// Admin-managed dashboard poster — isang row lang palagi (see admin.html).
-// Walang lalabas kung walang naka-upload na poster.
-async function loadAd(){
-  const { data, error } = await sb.from("ads")
-    .select("*").order("created_at", { ascending:false }).limit(1);
-  if (error || !data || !data.length) return;
-  const { data: urlData } = sb.storage.from("ads").getPublicUrl(data[0].image_path);
-  $("adImg").src = urlData.publicUrl;
-  $("adBanner").classList.remove("hide");
+/* ─────── AD BANNERS (3 slots) ─────── */
+// Admin-managed dashboard posters — 3 fixed slots (see admin.html).
+// Bawat slot ay pwedeng may optional link; kung meron, clickable ito
+// at bubukas sa bagong tab. Walang lalabas kung walang naka-upload
+// sa isang slot.
+async function loadAds(){
+  const { data, error } = await sb.from("ads").select("*");
+  if (error || !data) return;
+  const bySlot = {};
+  data.forEach(r => { bySlot[r.slot] = r; });
+  for (let slot = 1; slot <= 3; slot++){
+    const row = bySlot[slot];
+    const banner = $("adBanner" + slot);
+    const img = $("adImg" + slot);
+    if (!row) { banner.classList.add("hide"); continue; }
+    const { data: urlData } = sb.storage.from("ads").getPublicUrl(row.image_path);
+    img.src = urlData.publicUrl;
+    banner.classList.remove("hide");
+    if (row.link_url) {
+      banner.style.cursor = "pointer";
+      banner.onclick = () => window.open(row.link_url, "_blank", "noopener");
+    } else {
+      banner.style.cursor = "default";
+      banner.onclick = null;
+    }
+  }
 }
 
 /* ─────── PRODUCTS ─────── */
