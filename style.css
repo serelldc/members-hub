@@ -1,4 +1,3 @@
-/* deploy-retry v2 */
 :root{
   --bg:#0a0a0c; --bg2:#111214; --card:#141517; --card2:#1a1b1e;
   --line:rgba(255,255,255,.08); --line-hi:rgba(255,255,255,.18);
@@ -17,10 +16,12 @@ html[data-theme="light"]{
   --ok:#0b7d54; --warn:#96600a; --danger:#b8342f;
 }
 *{box-sizing:border-box;margin:0;padding:0}
+html{overflow-x:hidden}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
   background:var(--bg); color:var(--txt); min-height:100vh; -webkit-font-smoothing:antialiased;
   transition:background-color .2s, color .2s;
+  overflow-x:hidden;
 }
 body::before{
   content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
@@ -265,9 +266,15 @@ footer .flogo{height:32px;width:auto;opacity:.65;margin-bottom:10px}
   .hero h2{font-size:20px}
   .who .name{display:none}
   main{padding:20px 15px 60px}
-  .topbar-in{padding:11px 15px}
+  .topbar-in{padding:11px 15px;gap:6px}
   .row2{grid-template-columns:1fr}
-  .logo img{height:38px}
+  .logo img{height:30px}
+  .logo span{display:none}
+  .who{gap:5px}
+  .tier-badge{padding:2px 6px}
+  .avatar{width:26px;height:26px;font-size:11px}
+  .btn.sm{padding:5px 8px}
+  .theme-toggle{width:30px;height:30px}
   .brand-mark img{height:76px}
 }
 
