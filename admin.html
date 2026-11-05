@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Admin — Digz Members</title>
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 <script>(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light");}catch(e){}})();</script>
 </head>
 <body>
@@ -52,6 +52,7 @@
       <button class="chip on" data-tab="pay">Payments</button>
       <button class="chip" data-tab="prod">Products</button>
       <button class="chip" data-tab="mem">Members</button>
+      <button class="chip" data-tab="downloads">Downloads</button>
       <button class="chip" data-tab="sugg">Suggestions</button>
       <button class="chip" data-tab="resources">Resources</button>
       <button class="chip" data-tab="referrals">Referrals</button>
@@ -99,6 +100,20 @@
         <thead><tr><th>Name</th><th>Email</th><th>Tier</th><th>Downloads</th>
           <th>Agent Link</th><th>Joined</th><th>Expires</th><th></th></tr></thead>
         <tbody id="memBody"><tr><td colspan="8" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
+
+    <!-- ══ DOWNLOADS (every download event, across all members) ══ -->
+    <section id="tab-downloads" class="hide">
+      <div class="toolbar" style="margin-bottom:14px">
+        <div class="search"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="search" id="dlQ" placeholder="Search by member or product..."></div>
+        <button class="btn ghost sm" id="expDl">Export CSV</button>
+      </div>
+      <div id="dlMsg" class="msg hide"></div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Date</th><th>Member</th><th>Product</th><th>Type</th><th>Category</th></tr></thead>
+        <tbody id="dlAdminBody"><tr><td colspan="5" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
       </table></div>
     </section>
 
@@ -303,7 +318,7 @@
   </div>
 </div>
 
-<script src="config.js?v=10"></script>
+<script src="config.js?v=11"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -360,7 +375,7 @@ if (C.SUPABASE_URL.includes("YOUR-PROJECT-REF")) {
 }
 const sb = createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY);
 
-let members = [], payments = [], prods = [], suggestions = [];
+let members = [], payments = [], prods = [], suggestions = [], downloadsLog = [];
 
 function msg(id, text, kind){
   const e = $(id); e.className = "msg " + (kind||"err"); e.innerHTML = text; e.classList.remove("hide");
@@ -423,7 +438,8 @@ document.querySelectorAll("[data-tab]").forEach(b => {
   b.onclick = () => {
     document.querySelectorAll("[data-tab]").forEach(x => x.classList.remove("on"));
     b.classList.add("on");
-    ["pay","prod","mem","sugg","resources","referrals","analytics","ads"].forEach(t => $("tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
+    ["pay","prod","mem","downloads","sugg","resources","referrals","analytics","ads"].forEach(t => $("tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
+    if (b.dataset.tab === "downloads") loadDownloadsLog();
     if (b.dataset.tab === "sugg") loadSuggestions();
     if (b.dataset.tab === "resources") loadResources();
     if (b.dataset.tab === "referrals") loadReferrals();
@@ -456,6 +472,14 @@ $("expMem").onclick = () => {
   const rows = members.map(m => [m.full_name || "", m.email, m.tier, m.downloads,
     m.agent_code || "", fmt(m.created_at), m.expires_at ? fmt(m.expires_at) : ""]);
   downloadCSV("members.csv", toCSV(rows, ["Name","Email","Tier","Downloads","Agent Code","Joined","Expires"]));
+};
+$("expDl").onclick = () => {
+  const rows = downloadsLog.map(d => {
+    const m = members.find(x => x.id === d.user_id);
+    return [fmt(d.created_at), m?.full_name || "", m?.email || (d.user_id || "").slice(0,8),
+      d.products?.title || "Deleted product", d.products?.kind || "", d.products?.category || ""];
+  });
+  downloadCSV("downloads.csv", toCSV(rows, ["Date","Member","Email","Product","Type","Category"]));
 };
 
 async function loadAll(){
@@ -716,6 +740,52 @@ function renderMembers(){
       loadMembers();
     };
   });
+}
+
+/* ═══ DOWNLOADS (every download event, across all members) ═══
+   RLS on public.downloads already lets an admin select every row (see
+   downloads_select policy in schema.sql), so this is a plain table read
+   joined to products — then matched against the already-loaded `members`
+   array client-side for the name/email, same pattern as Payments/Suggestions. */
+async function loadDownloadsLog(){
+  const { data, error } = await sb.from("downloads")
+    .select("id, created_at, user_id, products(title, kind, category)")
+    .order("created_at", { ascending:false })
+    .limit(1000);
+  if (error) return msg("dlMsg", esc(error.message));
+  downloadsLog = data || [];
+  renderDownloadsLog();
+}
+
+$("dlQ").oninput = renderDownloadsLog;
+
+function renderDownloadsLog(){
+  const q = ($("dlQ").value || "").toLowerCase();
+  const list = downloadsLog.filter(d => {
+    if (!q) return true;
+    const m = members.find(x => x.id === d.user_id);
+    const hay = [m?.full_name, m?.email, d.products?.title, d.products?.category, d.products?.kind]
+      .filter(Boolean).join(" ").toLowerCase();
+    return hay.includes(q);
+  });
+
+  if (!list.length) {
+    $("dlAdminBody").innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--muted);padding:36px">' +
+      (downloadsLog.length ? "No results found." : "No downloads logged yet.") + "</td></tr>";
+    return;
+  }
+
+  $("dlAdminBody").innerHTML = list.map(d => {
+    const m = members.find(x => x.id === d.user_id);
+    return "<tr>" +
+      "<td>" + fmt(d.created_at) + "</td>" +
+      "<td><b>" + esc(m?.full_name || "—") + "</b><br><small style='color:var(--muted)'>" +
+        esc(m?.email || (d.user_id || "").slice(0,8)) + "</small></td>" +
+      "<td><b>" + esc(d.products?.title || "Deleted product") + "</b></td>" +
+      "<td>" + esc(d.products?.kind || "—") + "</td>" +
+      "<td>" + esc(d.products?.category || "—") + "</td>" +
+      "</tr>";
+  }).join("");
 }
 
 /* ═══ SUGGESTIONS ═══ */
