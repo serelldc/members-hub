@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Digz Members</title>
-<link rel="stylesheet" href="style.css?v=10">
+<link rel="stylesheet" href="style.css?v=11">
 <script>(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light");}catch(e){}})();</script>
 </head>
 <body>
@@ -89,6 +89,7 @@
     <div class="chips" id="viewNav">
       <button class="chip on" data-view="browse">Browse Products</button>
       <button class="chip" data-view="downloads">My Downloads</button>
+      <button class="chip" data-view="saved" id="savedChip">Saved</button>
       <button class="chip" data-view="suggest">Suggest a Product</button>
       <button class="chip" data-view="resources">Resources</button>
       <button class="chip" data-view="invite">Invite &amp; Earn</button>
@@ -182,6 +183,12 @@
       </table></div>
     </section>
 
+    <!-- ═══════ SAVED ═══════ -->
+    <section id="view-saved" class="hide">
+      <h2 class="section-title">Saved</h2>
+      <div class="grid" id="savedGrid"><div class="empty">Loading saved items...</div></div>
+    </section>
+
     <!-- ═══════ SUGGEST A PRODUCT ═══════ -->
     <section id="view-suggest" class="hide">
       <h2 class="section-title">Suggest a Product</h2>
@@ -242,7 +249,21 @@
   </footer>
 </div>
 
-<script src="config.js?v=10"></script>
+<!-- ═══════ PRODUCT PREVIEW MODAL ═══════ -->
+<div id="previewModal" class="modal hide">
+  <div class="modal-box">
+    <div id="previewCover" class="preview-cover"></div>
+    <h3 id="previewTitle"></h3>
+    <p id="previewDesc" class="preview-desc"></p>
+    <div class="meta" id="previewMeta"></div>
+    <div class="modal-foot">
+      <button class="btn ghost" id="previewClose">Close</button>
+      <button class="btn" id="previewDl">Download</button>
+    </div>
+  </div>
+</div>
+
+<script src="config.js?v=11"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
@@ -272,6 +293,7 @@ $("themeToggleApp").onclick = toggleTheme;
 const ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>';
 const ICON_WARN = '<svg class="empty-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 9v5"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>';
 const ICON_SEARCH = '<svg class="empty-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>';
+const ICON_STAR = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>';
 
 // Derives a 1-2 letter monogram from the title — used as the cover tile
 // when there's no custom cover image. "Starter Guide" → "SG", "VIP Vault" → "VV".
@@ -307,6 +329,7 @@ $("supportLink").href = "mailto:" + C.supportEmail;
 let mode = "login";
 let profile = null;
 let products = [];
+let userId = null;
 let state = { cat:"all", type:"all", q:"", sort:"new" };
 
 // Captured once on page load, before the ?ref= query string is ever
@@ -314,14 +337,36 @@ let state = { cat:"all", type:"all", q:"", sort:"new" };
 // new signup (see "Invite & Earn").
 const inviteRef = new URLSearchParams(location.search).get("ref");
 
+/* ─────── SAVED / BOOKMARKS (per-member, stored locally in the browser) ─────── */
+function savedKey(){ return "digz_saved_" + (userId || "anon"); }
+function getSavedIds(){
+  try { return JSON.parse(localStorage.getItem(savedKey())) || []; } catch(e){ return []; }
+}
+function setSavedIds(ids){
+  try { localStorage.setItem(savedKey(), JSON.stringify(ids)); } catch(e){}
+}
+function isSaved(id){ return getSavedIds().includes(id); }
+function toggleSaved(id){
+  let ids = getSavedIds();
+  if (ids.includes(id)) ids = ids.filter(x => x !== id);
+  else ids.push(id);
+  setSavedIds(ids);
+  return ids.includes(id);
+}
+function updateSavedCount(){
+  const n = getSavedIds().length;
+  $("savedChip").textContent = "Saved" + (n ? " (" + n + ")" : "");
+}
+
 /* ─────── VIEW NAV ─────── */
-const VIEWS = ["browse","downloads","suggest","resources","invite","refer","faq"];
+const VIEWS = ["browse","downloads","saved","suggest","resources","invite","refer","faq"];
 document.querySelectorAll("#viewNav [data-view]").forEach(b => {
   b.onclick = () => {
     document.querySelectorAll("#viewNav [data-view]").forEach(x => x.classList.remove("on"));
     b.classList.add("on");
     VIEWS.forEach(v => $("view-" + v).classList.toggle("hide", v !== b.dataset.view));
     if (b.dataset.view === "downloads") loadDownloadHistory();
+    if (b.dataset.view === "saved") renderSaved();
     if (b.dataset.view === "suggest") loadSuggestions();
     if (b.dataset.view === "resources") loadResources();
     if (b.dataset.view === "invite") setupInvite();
@@ -427,6 +472,7 @@ async function boot(){
   $("appView").classList.remove("hide");
 
   const { data:{ user } } = await sb.auth.getUser();
+  userId = user.id;
   const { data:prof } = await sb.from("profiles").select("*").eq("id", user.id).single();
   profile = prof || { full_name: user.email.split("@")[0], tier: "free", is_admin: false };
 
@@ -442,6 +488,8 @@ async function boot(){
   tb.textContent = profile.tier;
   tb.className = "tier-badge tier-" + profile.tier;
   if (profile.is_admin) $("adminLink").classList.remove("hide");
+
+  updateSavedCount();
 
   if (C.announcement) showMsg("announce", C.announcement, "warn");
 
@@ -516,6 +564,61 @@ $("q").oninput = e => { state.q = e.target.value.toLowerCase(); render(); };
 $("typeSel").onchange = e => { state.type = e.target.value; render(); };
 $("sortSel").onchange = e => { state.sort = e.target.value; render(); };
 
+// Shared card template — used by the main Browse grid and the Saved grid,
+// so bookmarking and preview behave identically in both places.
+function cardHtml(p, monthAgo){
+  const isNew = new Date(p.created_at) > monthAgo;
+  // Product's own cover first; if none, the category image
+  // (config.js → categoryImages); if that's missing too, a monogram tile.
+  const ownImg = /^https?:\/\//.test(p.cover || "");
+  const catImg = !ownImg && C.categoryImages && C.categoryImages[p.category];
+  const bgUrl = ownImg ? p.cover : (catImg || "");
+  const hasImg = !!bgUrl;
+  const style = hasImg
+    ? "background-image:linear-gradient(to top, rgba(5,6,8,.65), rgba(5,6,8,0) 55%), url(" + esc(bgUrl) + ")"
+    : "";
+  const coverInner = hasImg
+    ? '<span class="kind-tag">' + esc(p.kind) + '</span>'
+    : '<span class="mono">' + esc(initials(p.title)) + '</span>' +
+      '<span class="kind-tag">' + esc(p.kind) + '</span>';
+  const saved = isSaved(p.id);
+  return '<article class="card">' +
+    '<div class="cover" style="' + style + '" data-preview="' + p.id + '">' + coverInner +
+      '<button class="save-btn' + (saved ? " on" : "") + '" data-save="' + p.id + '" title="Save" aria-label="Save for later">' + ICON_STAR + '</button>' +
+      (isNew ? '<span class="tag new">New</span>' : "") +
+    '</div>' +
+    '<div class="card-body">' +
+      "<h3>" + esc(p.title) + "</h3>" +
+      "<p>" + esc(p.description || "") + "</p>" +
+      '<div class="meta">' +
+        '<span class="pill">' + esc(p.kind) + "</span>" +
+        '<span class="pill">' + esc(p.category) + "</span>" +
+        (p.file_size ? '<span class="pill">' + esc(p.file_size) + "</span>" : "") +
+      "</div>" +
+      '<button class="dl" data-id="' + p.id + '">' + ICON_DL + '<span>Download</span></button>' +
+    "</div></article>";
+}
+
+// Wires up the bookmark star + cover-click-to-preview on a freshly
+// rendered batch of cards. Called after both the Browse grid and the
+// Saved grid are (re)rendered.
+function wireCardExtras(container){
+  container.querySelectorAll("[data-save]").forEach(b => {
+    b.onclick = (e) => {
+      e.stopPropagation();
+      const id = b.dataset.save;
+      const nowSaved = toggleSaved(id);
+      b.classList.toggle("on", nowSaved);
+      updateSavedCount();
+      // If we're looking at the Saved tab, the list itself just changed
+      if (!$("view-saved").classList.contains("hide")) renderSaved();
+    };
+  });
+  container.querySelectorAll("[data-preview]").forEach(c => {
+    c.onclick = () => openPreview(c.dataset.preview);
+  });
+}
+
 function render(){
   const now = new Date();
   const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
@@ -541,38 +644,9 @@ function render(){
     return;
   }
 
-  $("grid").innerHTML = list.map(p => {
-    const isNew = new Date(p.created_at) > monthAgo;
-    // Product's own cover first; if none, the category image
-    // (config.js → categoryImages); if that's missing too, a monogram tile.
-    const ownImg = /^https?:\/\//.test(p.cover || "");
-    const catImg = !ownImg && C.categoryImages && C.categoryImages[p.category];
-    const bgUrl = ownImg ? p.cover : (catImg || "");
-    const hasImg = !!bgUrl;
-    const style = hasImg
-      ? "background-image:linear-gradient(to top, rgba(5,6,8,.65), rgba(5,6,8,0) 55%), url(" + esc(bgUrl) + ")"
-      : "";
-    const coverInner = hasImg
-      ? '<span class="kind-tag">' + esc(p.kind) + '</span>'
-      : '<span class="mono">' + esc(initials(p.title)) + '</span>' +
-        '<span class="kind-tag">' + esc(p.kind) + '</span>';
-    return '<article class="card">' +
-      '<div class="cover" style="' + style + '">' + coverInner +
-        (isNew ? '<span class="tag new">New</span>' : "") +
-      '</div>' +
-      '<div class="card-body">' +
-        "<h3>" + esc(p.title) + "</h3>" +
-        "<p>" + esc(p.description || "") + "</p>" +
-        '<div class="meta">' +
-          '<span class="pill">' + esc(p.kind) + "</span>" +
-          '<span class="pill">' + esc(p.category) + "</span>" +
-          (p.file_size ? '<span class="pill">' + esc(p.file_size) + "</span>" : "") +
-        "</div>" +
-        '<button class="dl" data-id="' + p.id + '">' + ICON_DL + '<span>Download</span></button>' +
-      "</div></article>";
-  }).join("");
-
+  $("grid").innerHTML = list.map(p => cardHtml(p, monthAgo)).join("");
   $("grid").querySelectorAll(".dl").forEach(b => { b.onclick = () => download(b); });
+  wireCardExtras($("grid"));
 }
 
 async function download(btn){
@@ -631,6 +705,55 @@ async function loadDownloadHistory(){
     "<td>" + esc(r.products?.category || "—") + "</td>" +
     "</tr>").join("");
 }
+
+/* ─────── SAVED ─────── */
+// Bookmarks are stored locally per-browser (not in Supabase), so they
+// just filter whatever is already in the in-memory `products` list.
+function renderSaved(){
+  const now = new Date();
+  const monthAgo = new Date(now.getFullYear(), now.getMonth() - 1, now.getDate());
+  const ids = getSavedIds();
+  const list = products.filter(p => ids.includes(p.id));
+
+  if (!list.length){
+    $("savedGrid").innerHTML = '<div class="empty">' + ICON_SEARCH +
+      "Wala ka pang na-save. Mag-click ng star icon sa cover ng isang product para idagdag dito." + "</div>";
+    return;
+  }
+  $("savedGrid").innerHTML = list.map(p => cardHtml(p, monthAgo)).join("");
+  $("savedGrid").querySelectorAll(".dl").forEach(b => { b.onclick = () => download(b); });
+  wireCardExtras($("savedGrid"));
+}
+
+/* ─────── PRODUCT PREVIEW MODAL ─────── */
+function openPreview(id){
+  const p = products.find(x => x.id === id);
+  if (!p) return;
+  const ownImg = /^https?:\/\//.test(p.cover || "");
+  const catImg = !ownImg && C.categoryImages && C.categoryImages[p.category];
+  const bgUrl = ownImg ? p.cover : (catImg || "");
+  const cover = $("previewCover");
+  if (bgUrl) {
+    cover.style.backgroundImage = "linear-gradient(to top, rgba(5,6,8,.55), rgba(5,6,8,0) 55%), url(\"" + bgUrl.replace(/"/g,'\\"') + "\")";
+    cover.innerHTML = "";
+  } else {
+    cover.style.backgroundImage = "";
+    cover.innerHTML = '<span class="mono">' + esc(initials(p.title)) + "</span>";
+  }
+  $("previewTitle").textContent = p.title;
+  $("previewDesc").textContent = p.description || "No description yet.";
+  $("previewMeta").innerHTML =
+    '<span class="pill">' + esc(p.kind) + "</span>" +
+    '<span class="pill">' + esc(p.category) + "</span>" +
+    (p.file_size ? '<span class="pill">' + esc(p.file_size) + "</span>" : "");
+  $("previewDl").dataset.id = p.id;
+  $("previewModal").classList.remove("hide");
+}
+function closePreview(){ $("previewModal").classList.add("hide"); }
+$("previewClose").onclick = closePreview;
+$("previewModal").addEventListener("click", e => { if (e.target.id === "previewModal") closePreview(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePreview(); });
+$("previewDl").onclick = () => download($("previewDl"));
 
 /* ─────── SUGGEST A PRODUCT ─────── */
 $("suggestForm").addEventListener("submit", async e => {

@@ -1,3 +1,4 @@
+/* deploy-retry v2 */
 :root{
   --bg:#0a0a0c; --bg2:#111214; --card:#141517; --card2:#1a1b1e;
   --line:rgba(255,255,255,.08); --line-hi:rgba(255,255,255,.18);
@@ -16,12 +17,10 @@ html[data-theme="light"]{
   --ok:#0b7d54; --warn:#96600a; --danger:#b8342f;
 }
 *{box-sizing:border-box;margin:0;padding:0}
-html{overflow-x:hidden}
 body{
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,Roboto,sans-serif;
   background:var(--bg); color:var(--txt); min-height:100vh; -webkit-font-smoothing:antialiased;
   transition:background-color .2s, color .2s;
-  overflow-x:hidden;
 }
 body::before{
   content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
@@ -136,12 +135,27 @@ main{max-width:1180px;margin:0 auto;padding:26px 22px 80px;position:relative;z-i
 .grid .card:nth-child(8){animation-delay:.30s}
 .grid .card:nth-child(n+9){animation-delay:.33s}
 .card:hover{border-color:var(--line-hi);box-shadow:0 10px 26px rgba(0,0,0,.4)}
-.cover{height:124px;position:relative;background:linear-gradient(160deg,#161d29,#0e131b);background-size:cover;background-position:center}
+.cover{height:124px;position:relative;background:linear-gradient(160deg,#161d29,#0e131b);background-size:cover;background-position:center;cursor:pointer}
 .cover::after{content:"";position:absolute;inset:0;background:radial-gradient(160px 120px at 14% 12%, rgba(91,144,245,.20), transparent 72%);pointer-events:none}
 .cover .mono{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;letter-spacing:-1px;color:rgba(255,255,255,.82)}
 .cover .kind-tag{position:absolute;left:12px;bottom:10px;font-size:9px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,.5);z-index:1}
 .cover .tag{position:absolute;top:10px;right:10px;font-size:9px;font-weight:700;padding:4px 8px;border-radius:6px;letter-spacing:.5px;text-transform:uppercase;background:rgba(0,0,0,.4);backdrop-filter:blur(6px);color:rgba(255,255,255,.85);border:1px solid rgba(255,255,255,.12);z-index:1}
 .cover .tag.new{background:var(--accent);color:#fff;border-color:transparent}
+/* Bookmark/"save for later" toggle — top-left of the cover, mirrors the
+   "New" tag's top-right position. Click stops propagation so it doesn't
+   also trigger the cover's own click-to-preview. */
+.save-btn{
+  position:absolute; top:10px; left:10px; z-index:2;
+  width:28px; height:28px; border-radius:50%;
+  background:rgba(0,0,0,.4); backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.14);
+  display:flex; align-items:center; justify-content:center;
+  color:rgba(255,255,255,.75); transition:.15s;
+}
+.save-btn:hover{color:#fff;border-color:rgba(255,255,255,.3)}
+.save-btn svg{width:14px;height:14px;flex-shrink:0}
+.save-btn.on{color:var(--gold);border-color:rgba(201,162,75,.5);background:rgba(0,0,0,.55)}
+.save-btn.on svg{fill:currentColor}
 .card-body{padding:16px 17px;flex:1;display:flex;flex-direction:column}
 .card-body h3{font-size:15px;font-weight:650;line-height:1.35;margin-bottom:7px;letter-spacing:-.15px}
 .card-body p{font-size:13px;color:var(--muted);line-height:1.55;flex:1;margin-bottom:13px}
@@ -233,6 +247,17 @@ td.actions{white-space:nowrap;display:flex;gap:6px}
 .modal-box h3{font-size:17px;font-weight:700;margin-bottom:18px}
 .modal-foot{display:flex;gap:10px;margin-top:22px}
 .modal-foot .btn{flex:1}
+/* Product preview modal — reuses the same cover treatment as the card,
+   just bigger, so the two feel consistent. */
+.preview-cover{
+  height:200px;border-radius:10px;margin-bottom:18px;
+  background-size:cover;background-position:center;
+  background-color:var(--bg2);
+  display:flex;align-items:center;justify-content:center;
+  position:relative;overflow:hidden
+}
+.preview-cover .mono{font-size:40px;font-weight:800;letter-spacing:-1px;color:rgba(255,255,255,.82)}
+.preview-desc{color:var(--muted);font-size:13.5px;line-height:1.6;margin:0 0 14px}
 
 .section-title{font-size:18px;font-weight:700;margin:32px 0 14px;letter-spacing:-.2px}
 .section-title:first-child{margin-top:0}
@@ -266,15 +291,9 @@ footer .flogo{height:32px;width:auto;opacity:.65;margin-bottom:10px}
   .hero h2{font-size:20px}
   .who .name{display:none}
   main{padding:20px 15px 60px}
-  .topbar-in{padding:11px 15px;gap:6px}
+  .topbar-in{padding:11px 15px}
   .row2{grid-template-columns:1fr}
-  .logo img{height:30px}
-  .logo span{display:none}
-  .who{gap:5px}
-  .tier-badge{padding:2px 6px}
-  .avatar{width:26px;height:26px;font-size:11px}
-  .btn.sm{padding:5px 8px}
-  .theme-toggle{width:30px;height:30px}
+  .logo img{height:38px}
   .brand-mark img{height:76px}
 }
 
