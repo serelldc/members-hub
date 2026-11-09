@@ -298,6 +298,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="certs/cert.css?v=1">
+<style>
+/* The hub's own .logo and .meta classes (used for the brand logo and
+   product pill rows) collide with cert.css's .cert .logo / .cert .meta.
+   Re-assert the certificate's intended layout so it isn't squashed. */
+.cert .logo{display:block!important}
+.cert .logo img{display:inline!important;height:auto!important}
+.cert .meta{display:block!important;margin-bottom:0!important}
+</style>
 <script src="config.js?v=11"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
@@ -797,6 +805,12 @@ $("previewDl").onclick = () => download($("previewDl"));
 let myCerts = [];
 let certModalEl = null;
 
+// certificates rows come back from Supabase as sign_name/sign_title
+// (snake_case); fillCert() expects signName/signTitle (camelCase).
+function certFillData(c){
+  return Object.assign({}, c, { signName: c.sign_name, signTitle: c.sign_title });
+}
+
 async function loadMyCertificates(){
   const { data, error } = await sb.from("certificates")
     .select("*").order("created_at", { ascending:false });
@@ -840,7 +854,7 @@ async function openCertModal(c){
   $("certModal").classList.remove("hide");
   const host = $("certModalHost");
   if (!certModalEl) certModalEl = mountCert(host, "b");
-  await fillCert(certModalEl, c);
+  await fillCert(certModalEl, certFillData(c));
 }
 function closeCertModal(){ $("certModal").classList.add("hide"); }
 $("certModalClose").onclick = closeCertModal;
@@ -857,7 +871,7 @@ $("certModalDl").onclick = async () => {
     host.style.position = "fixed"; host.style.left = "-99999px"; host.style.top = "0";
     document.body.appendChild(host);
     const el = mountCert(host, "b");
-    await fillCert(el, c);
+    await fillCert(el, certFillData(c));
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
     const canvas = await html2canvas(el, { scale:3, useCORS:true });
     const img = canvas.toDataURL("image/jpeg", 0.95);

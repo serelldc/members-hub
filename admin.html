@@ -10,6 +10,14 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="certs/cert.css?v=1">
+<style>
+/* The hub's own .logo and .meta classes (used for the brand logo and
+   product pill rows) collide with cert.css's .cert .logo / .cert .meta.
+   Re-assert the certificate's intended layout so it isn't squashed. */
+.cert .logo{display:block!important}
+.cert .logo img{display:inline!important;height:auto!important}
+.cert .meta{display:block!important;margin-bottom:0!important}
+</style>
 <script>(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light");}catch(e){}})();</script>
 </head>
 <body>
@@ -1167,8 +1175,16 @@ function certDraft(){
     dates: $("certDates").value.trim(),
     issue: $("certIssue").value || new Date().toISOString().slice(0,10),
     serial: "SRDC-PREVIEW",
-    code: "PRVW-0000-0000"
+    code: "PRVW-0000-0000",
+    signName: "Coach Se Rell",
+    signTitle: "SRDC"
   };
+}
+
+// certificates rows come back from Supabase as sign_name/sign_title
+// (snake_case); fillCert() expects signName/signTitle (camelCase).
+function certFillData(c){
+  return Object.assign({}, c, { signName: c.sign_name, signTitle: c.sign_title });
 }
 
 let certPreviewTimer = null;
@@ -1306,7 +1322,7 @@ async function downloadCertPdf(c){
   document.body.appendChild(host);
   try {
     const el = mountCert(host, "b");
-    await fillCert(el, c);
+    await fillCert(el, certFillData(c));
     if (document.fonts && document.fonts.ready) await document.fonts.ready;
     const canvas = await html2canvas(el, { scale:3, useCORS:true });
     const img = canvas.toDataURL("image/jpeg", 0.95);
