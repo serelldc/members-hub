@@ -259,6 +259,9 @@
         <form id="certForm" style="flex:1;min-width:280px;max-width:380px">
           <div class="field"><label for="certMember">Member</label>
             <select id="certMember" required><option value="">Loading members...</option></select></div>
+          <div class="field"><label for="certName">Participant Name on Certificate</label>
+            <input type="text" id="certName" placeholder="Pangalan na lalabas sa certificate" required></div>
+          <div class="hint" style="margin:-6px 0 12px">Auto-fill mula sa profile pag pumili ng member — pwede mo pang i-edit (hal. may title na Dr., ibang spelling, atbp).</div>
           <div class="field"><label for="certEvent">Webinar / Seminar Title</label>
             <input type="text" id="certEvent" placeholder="E-Book Writing with use of AI Tools" required></div>
           <div class="field"><label for="certDates">Dates Held (optional)</label>
@@ -1167,10 +1170,19 @@ function populateCertMemberSelect(){
   if (cur) sel.value = cur;
 }
 
+// When the admin picks a member, suggest that member's profile name in
+// the editable Name field. The admin can still type over it afterward —
+// this only fires on member selection, not on every keystroke.
+$("certMember").addEventListener("change", () => {
+  const m = members.find(x => x.id === $("certMember").value);
+  if (m) $("certName").value = m.full_name || m.email;
+});
+
 function certDraft(){
   const m = members.find(x => x.id === $("certMember").value);
+  const typed = $("certName").value.trim();
   return {
-    name: m ? (m.full_name || m.email) : "Participant Name",
+    name: typed || (m ? (m.full_name || m.email) : "Participant Name"),
     event: $("certEvent").value.trim() || "Webinar Title",
     dates: $("certDates").value.trim(),
     issue: $("certIssue").value || new Date().toISOString().slice(0,10),
@@ -1197,7 +1209,7 @@ async function updateCertPreview(){
   if (!certPreviewEl) certPreviewEl = mountCert(host, "b");
   await fillCert(certPreviewEl, certDraft());
 }
-["certMember","certEvent","certDates","certIssue"].forEach(id => {
+["certMember","certName","certEvent","certDates","certIssue"].forEach(id => {
   $(id).addEventListener("input", scheduleCertPreview);
   $(id).addEventListener("change", scheduleCertPreview);
 });
@@ -1221,13 +1233,14 @@ $("certForm").addEventListener("submit", async e => {
   const btn = $("certIssueBtn");
   const m = members.find(x => x.id === $("certMember").value);
   if (!m) return msg("certMsg", "Pumili muna ng member.");
+  const name = $("certName").value.trim();
+  if (!name) return msg("certMsg", "Kailangan ng pangalan na ilalagay sa certificate.");
   const event = $("certEvent").value.trim();
   const issue = $("certIssue").value;
   if (!event || !issue) return msg("certMsg", "Kailangan ng webinar title at issue date.");
   const dates = $("certDates").value.trim();
   const series = ($("certSeries").value.trim() || "EBW").toUpperCase();
   const year = issue.slice(0,4);
-  const name = m.full_name || m.email;
 
   btn.disabled = true;
   btn.textContent = "Issuing...";
@@ -1241,7 +1254,7 @@ $("certForm").addEventListener("submit", async e => {
     const { error } = await sb.from("certificates").insert(rec);
     if (error) throw error;
     msg("certMsg", "Na-issue na ang certificate — " + serial, "ok");
-    $("certEvent").value = ""; $("certDates").value = ""; $("certMember").value = "";
+    $("certEvent").value = ""; $("certDates").value = ""; $("certMember").value = ""; $("certName").value = "";
     scheduleCertPreview();
     loadCertificates();
   } catch(err) {
