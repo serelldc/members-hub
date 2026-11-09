@@ -94,7 +94,7 @@ function mountCert(host, theme){
 async function fillCert(el, d){
   const q = s => el.querySelector(s);
   q('.name').textContent = d.name || 'Participant Name';
-  q('.body').innerHTML = `has participated in the Online Seminar/Orientation on <b>${esc(d.event)}</b>` + (d.dates ? ` held on <b>${esc(d.dates)}</b>` : '') + '.';
+  q('.body').innerHTML = `has participated in the Online Seminar/Orientation on <b>${esc(d.event)}</b>` + (d.dates ? ` held on <b style="white-space:nowrap">${esc(d.dates)}</b>` : '') + '.';
   q('.given').textContent = `Given this ${fmtIssue(d.issue)} online on the occasion of its regular Seminar/Orientation.`;
   el.querySelectorAll('.v-serial,.m-serial').forEach(n => n.textContent = d.serial);
   q('.m-code').textContent = d.code;
