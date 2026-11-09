@@ -1,0 +1,97 @@
+/* SRDC certificate themes — 1123 x 794 px (A4 landscape @96dpi) */
+.cert{position:relative;width:1123px;height:794px;overflow:hidden;font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.cert *{box-sizing:border-box}
+.cert .bgfx{position:absolute;inset:0}
+.cert .bgfx::before,.cert .bgfx::after{content:'';position:absolute}
+.cert .wm{position:absolute;width:640px;left:241px;top:150px;opacity:.05;pointer-events:none}
+.cert .abs{position:absolute}
+.cert .logo{position:absolute}
+.cert .title{position:absolute}
+.cert .name-wrap{position:absolute;display:flex;align-items:center;height:86px}
+.cert .name{white-space:nowrap;line-height:1.15}
+.cert .rule{position:absolute;display:flex}
+.cert .rule i{display:block;height:2px}
+.cert .body b{font-weight:700}
+.cert .sig{position:absolute;width:300px;text-align:center}
+.cert .sig .img{height:104px;display:flex;align-items:flex-end;justify-content:center}
+.cert .sig .img img{max-height:104px;max-width:290px;margin-bottom:-10px}
+.cert .sig .ln{height:2px;margin:4px 0 8px}
+.cert .sig .sn{font-weight:700;font-size:17px}
+.cert .sig .st{font-size:11px;letter-spacing:.18em;text-transform:uppercase;margin-top:3px;font-weight:600}
+.cert .seal{position:absolute;width:128px;height:128px}
+.cert .qrbox{position:absolute;display:flex;gap:14px;align-items:center}
+.cert .qr{width:104px;height:104px;background:#fff;padding:6px;border-radius:8px;flex:none}
+.cert .qr img,.cert .qr canvas{width:100% !important;height:100% !important;display:block}
+.cert .meta{font-family:'Share Tech Mono',monospace;line-height:1.35}
+.cert .meta small{display:block;font-family:'Inter',sans-serif;font-size:9.5px;letter-spacing:.14em;text-transform:uppercase;margin-top:6px;font-weight:600}
+.cert .meta small:first-child{margin-top:0}
+.cert .meta b{display:block;font-weight:400;font-size:13.5px;letter-spacing:.03em}
+.cert .serialtop{position:absolute;font-family:'Share Tech Mono',monospace;font-size:13px;letter-spacing:.06em;text-align:right}
+.cert .serialtop small{display:block;font-family:'Inter',sans-serif;font-size:8.5px;letter-spacing:.2em;font-weight:600}
+.cert .sec{position:absolute;left:0;bottom:0;width:1123px;height:64px;display:block}
+
+/* ============ A · MIDNIGHT GOLD ============ */
+.t-a{background:#060a17;color:#eaf0ff}
+.t-a .bgfx::before{inset:0;background:radial-gradient(ellipse 70% 55% at 50% 0%,rgba(70,120,240,.38),transparent 70%),radial-gradient(ellipse 60% 40% at 50% 100%,rgba(242,180,77,.10),transparent 70%)}
+.t-a .bgfx::after{left:0;right:0;top:0;height:5px;background:linear-gradient(90deg,#b87a10,#ffe3a1,#f2b44d,#ffe3a1,#b87a10)}
+.t-a .logo{left:0;right:0;top:36px;text-align:center}.t-a .logo img{width:230px}
+.t-a .title{left:0;right:0;top:120px;text-align:center}
+.t-a .t1{display:block;font-family:'Sora',sans-serif;font-weight:700;font-size:44px;line-height:1;letter-spacing:.3em;padding-left:.3em;color:#f6c565}
+.t-a .t2{display:block;margin-top:14px;font-family:'Sora',sans-serif;font-weight:600;font-size:13px;letter-spacing:.55em;padding-left:.55em;color:#8fb8ff}
+.t-a .certify{position:absolute;left:0;right:0;top:258px;text-align:center;font-size:15px;color:#b9c6e6;letter-spacing:.04em}
+.t-a .name-wrap{top:284px;left:130px;right:130px;justify-content:center}
+.t-a .name{font-family:'Sora',sans-serif;font-weight:600;font-size:54px;color:#fff}
+.t-a .rule{top:376px;left:0;right:0;justify-content:center}.t-a .rule i{width:520px;background:linear-gradient(90deg,transparent,#f2b44d,transparent)}
+.t-a .body{position:absolute;top:394px;left:150px;right:150px;text-align:center;font-size:17.5px;line-height:1.7;color:#e3eaff}.t-a .body b{color:#ffd27a}
+.t-a .given{position:absolute;top:490px;left:150px;right:150px;text-align:center;font-size:14.5px;line-height:1.7;color:#a9b8dc}
+.t-a .sig{left:100px;bottom:62px;color:#fff}.t-a .sig .ln{background:linear-gradient(90deg,transparent,#f2b44d,transparent)}.t-a .sig .st{color:#8fb8ff}
+.t-a .seal{left:497px;bottom:66px}
+.t-a .qrbox{right:100px;bottom:62px}.t-a .qr{border:2px solid #f2b44d}
+.t-a .meta{color:#c9d5f2}.t-a .meta b{color:#ffd27a}.t-a .meta small{color:#8fb8ff}
+.t-a .serialtop{right:46px;top:24px;color:#ffd27a}.t-a .serialtop small{color:#8fb8ff}
+.t-a .sec{background:#0b1226;color:#f2b44d}
+
+/* ============ B · IVORY EXECUTIVE (FINAL) ============ */
+.t-b{background:#f7f4ec;color:#16213e}
+.t-b .bgfx::before{left:0;right:0;top:0;height:150px;background:linear-gradient(100deg,#08163a,#14306e)}
+.t-b .bgfx::after{left:0;right:0;top:150px;height:5px;background:linear-gradient(90deg,#b87a10,#ffd98a,#f2b44d,#ffd98a,#b87a10)}
+.t-b .wm{opacity:.045;top:200px}
+.t-b .logo{left:0;right:0;top:20px;text-align:center}.t-b .logo img{width:370px}
+.t-b .title{left:0;right:0;top:174px;text-align:center}
+.t-b .t1{display:block;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:38px;line-height:1;letter-spacing:.26em;padding-left:.26em;color:#0f2247}
+.t-b .t2{display:block;margin-top:12px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;font-size:13px;letter-spacing:.5em;padding-left:.5em;color:#1d5bc4}
+.t-b .certify{position:absolute;left:0;right:0;top:266px;text-align:center;font-size:15px;color:#4a5878;font-style:italic}
+.t-b .name-wrap{top:290px;left:130px;right:130px;justify-content:center}
+.t-b .name{font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;font-size:52px;color:#0f2247}
+.t-b .rule{top:382px;left:0;right:0;justify-content:center}.t-b .rule i{width:540px;height:3px;background:linear-gradient(90deg,transparent,#d9981c,transparent)}
+.t-b .body{position:absolute;top:402px;left:150px;right:150px;text-align:center;font-size:17.5px;line-height:1.7;color:#26324f}.t-b .body b{color:#0f2247}
+.t-b .given{position:absolute;top:498px;left:150px;right:150px;text-align:center;font-size:14.5px;line-height:1.7;color:#4a5878}
+.t-b .sig{left:100px;bottom:90px;color:#0f2247}.t-b .sig .ln{background:#0f2247;height:1.5px}.t-b .sig .st{color:#1d5bc4}.t-b .sig .img img{filter:drop-shadow(0 0 .8px #0f2247)}
+.t-b .seal{left:497px;bottom:94px}
+.t-b .qrbox{right:100px;bottom:90px}.t-b .qr{border:2px solid #0f2247}
+.t-b .meta{color:#26324f}.t-b .meta b{color:#0f2247;font-weight:700}.t-b .meta small{color:#1d5bc4}
+.t-b .serialtop{right:46px;top:22px;color:#ffd98a}.t-b .serialtop small{color:#9fc2ff}
+.t-b .sec{background:linear-gradient(180deg,#07102a,#050b1d);color:#f2b44d}
+
+/* ============ C · SPLIT PANEL ============ */
+.t-c{background:#fff;color:#14213d}
+.t-c .bgfx::before{left:0;top:0;bottom:0;width:300px;background:linear-gradient(170deg,#091534,#12296a)}
+.t-c .bgfx::after{left:300px;top:0;bottom:0;width:6px;background:linear-gradient(180deg,#5b9bf0,#f2b44d)}
+.t-c .wm{display:none}
+.t-c .logo{left:36px;top:40px}.t-c .logo img{width:228px}
+.t-c .serialtop{left:36px;top:126px;text-align:left;color:#ffd98a}.t-c .serialtop small{color:#9fc2ff}
+.t-c .seal{left:86px;top:220px}
+.t-c .qrbox{left:36px;bottom:52px;flex-direction:column;align-items:flex-start;gap:12px}
+.t-c .qr{width:112px;height:112px;border:2px solid #f2b44d}
+.t-c .meta{color:#cdd8f3}.t-c .meta b{color:#ffd98a}.t-c .meta small{color:#9fc2ff}
+.t-c .title{left:360px;top:62px;text-align:left}
+.t-c .t1{display:block;font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:54px;line-height:1;letter-spacing:.06em;color:#0b1a3d}
+.t-c .t2{display:block;margin-top:12px;font-family:'Space Grotesk',sans-serif;font-weight:600;font-size:14px;letter-spacing:.4em;color:#1d5bc4}
+.t-c .certify{position:absolute;left:360px;top:190px;font-size:15px;color:#4a5878}
+.t-c .name-wrap{top:212px;left:360px;right:60px;justify-content:flex-start}
+.t-c .name{font-family:'Space Grotesk',sans-serif;font-weight:700;font-size:56px;color:#0b1a3d}
+.t-c .rule{top:302px;left:360px;right:60px}.t-c .rule i{width:100%;height:3px;background:linear-gradient(90deg,#f2b44d,#5b9bf0)}
+.t-c .body{position:absolute;top:324px;left:360px;right:60px;font-size:18px;line-height:1.7;color:#26324f;font-family:'DM Sans','Inter',sans-serif}.t-c .body b{color:#0b1a3d}
+.t-c .given{position:absolute;top:430px;left:360px;right:60px;font-size:15px;line-height:1.7;color:#4a5878;font-family:'DM Sans','Inter',sans-serif}
+.t-c .sig{left:360px;bottom:70px;color:#0b1a3d;text-align:left}.t-c .sig .img{justify-content:flex-start}.t-c .sig .ln{background:#0b1a3d;height:1.5px}.t-c .sig .st{color:#1d5bc4}
+.t-c .sec{background:linear-gradient(90deg,#091534,#12296a);color:#f2b44d}
