@@ -6,6 +6,10 @@
 <meta name="robots" content="noindex, nofollow">
 <title>Admin — Digz Members</title>
 <link rel="stylesheet" href="style.css?v=11">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="certs/cert.css?v=1">
 <script>(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light");}catch(e){}})();</script>
 </head>
 <body>
@@ -58,6 +62,7 @@
       <button class="chip" data-tab="referrals">Referrals</button>
       <button class="chip" data-tab="analytics">Analytics</button>
       <button class="chip" data-tab="ads">Ads</button>
+      <button class="chip" data-tab="certificates">Certificates</button>
     </div>
 
     <!-- ══ PAYMENTS ══ -->
@@ -234,6 +239,51 @@
         </div>
       </div>
     </section>
+
+    <!-- ══ CERTIFICATES ══ -->
+    <section id="tab-certificates" class="hide">
+      <p style="color:var(--muted);font-size:13.5px;margin-bottom:16px;line-height:1.6">
+        Pumili ng member, ilagay ang detalye ng webinar, tapos i-click ang "Issue Certificate" —
+        awtomatikong gagawin ng system ang serial number, security code, at QR (Theme: Ivory Executive).
+      </p>
+      <div id="certMsg" class="msg hide"></div>
+      <div style="display:flex;gap:24px;flex-wrap:wrap;margin-bottom:28px">
+        <form id="certForm" style="flex:1;min-width:280px;max-width:380px">
+          <div class="field"><label for="certMember">Member</label>
+            <select id="certMember" required><option value="">Loading members...</option></select></div>
+          <div class="field"><label for="certEvent">Webinar / Seminar Title</label>
+            <input type="text" id="certEvent" placeholder="E-Book Writing with use of AI Tools" required></div>
+          <div class="field"><label for="certDates">Dates Held (optional)</label>
+            <input type="text" id="certDates" placeholder="October 25, 2026"></div>
+          <div class="row2">
+            <div class="field"><label for="certIssue">Issue Date</label>
+              <input type="date" id="certIssue" required></div>
+            <div class="field"><label for="certSeries">Series Code</label>
+              <input type="text" id="certSeries" value="EBW" maxlength="6" style="text-transform:uppercase"></div>
+          </div>
+          <button type="submit" class="btn full" id="certIssueBtn">Issue Certificate</button>
+        </form>
+        <div style="flex:2;min-width:300px">
+          <div style="overflow:auto;border:1px solid var(--line);border-radius:10px;background:#0b1226;padding:12px">
+            <div id="certPreviewWrap" style="width:449.2px;height:317.6px">
+              <div id="certPreviewHost" style="width:1123px;height:794px;transform:scale(.4);transform-origin:top left"></div>
+            </div>
+          </div>
+          <p style="color:var(--muted);font-size:12px;margin-top:8px">Live preview — placeholder serial/code hanggang ma-issue.</p>
+        </div>
+      </div>
+
+      <div class="toolbar" style="margin-bottom:14px">
+        <div class="search"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+          <input type="search" id="certQ" placeholder="Search by member or serial..."></div>
+        <button class="btn ghost sm" id="expCert">Export CSV</button>
+      </div>
+      <div id="certTblMsg" class="msg hide"></div>
+      <div class="tblwrap"><table>
+        <thead><tr><th>Serial</th><th>Member</th><th>Event</th><th>Issue Date</th><th>Status</th><th></th></tr></thead>
+        <tbody id="certBody"><tr><td colspan="6" style="text-align:center;color:var(--muted);padding:30px">Loading...</td></tr></tbody>
+      </table></div>
+    </section>
   </main>
 </div>
 
@@ -318,6 +368,12 @@
   </div>
 </div>
 
+<script src="certs/sig.js?v=1"></script>
+<script src="certs/assets.js?v=1"></script>
+<script src="certs/cert.js?v=1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="config.js?v=11"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
@@ -375,7 +431,7 @@ if (C.SUPABASE_URL.includes("YOUR-PROJECT-REF")) {
 }
 const sb = createClient(C.SUPABASE_URL, C.SUPABASE_ANON_KEY);
 
-let members = [], payments = [], prods = [], suggestions = [], downloadsLog = [];
+let members = [], payments = [], prods = [], suggestions = [], downloadsLog = [], certs = [];
 
 function msg(id, text, kind){
   const e = $(id); e.className = "msg " + (kind||"err"); e.innerHTML = text; e.classList.remove("hide");
@@ -438,13 +494,14 @@ document.querySelectorAll("[data-tab]").forEach(b => {
   b.onclick = () => {
     document.querySelectorAll("[data-tab]").forEach(x => x.classList.remove("on"));
     b.classList.add("on");
-    ["pay","prod","mem","downloads","sugg","resources","referrals","analytics","ads"].forEach(t => $("tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
+    ["pay","prod","mem","downloads","sugg","resources","referrals","analytics","ads","certificates"].forEach(t => $("tab-" + t).classList.toggle("hide", t !== b.dataset.tab));
     if (b.dataset.tab === "downloads") loadDownloadsLog();
     if (b.dataset.tab === "sugg") loadSuggestions();
     if (b.dataset.tab === "resources") loadResources();
     if (b.dataset.tab === "referrals") loadReferrals();
     if (b.dataset.tab === "analytics") loadAnalytics();
     if (b.dataset.tab === "ads") loadAds();
+    if (b.dataset.tab === "certificates") loadCertificates();
   };
 });
 
@@ -1086,6 +1143,186 @@ for (let slot = 1; slot <= 3; slot++) {
     };
   })(slot);
 }
+
+/* ═══ CERTIFICATES ═══
+   Reuses certs/cert.js (mountCert/fillCert/makeCode/verifyUrl — same
+   SALT as the original standalone generator) so newly issued
+   certificates stay consistent with the ones already issued there. */
+let certPreviewEl = null;
+
+function populateCertMemberSelect(){
+  const sel = $("certMember");
+  const cur = sel.value;
+  if (!members.length) { sel.innerHTML = '<option value="">No members found</option>'; return; }
+  sel.innerHTML = '<option value="">— Select member —</option>' +
+    members.map(m => '<option value="' + m.id + '">' + esc(m.full_name || m.email) + " — " + esc(m.email) + "</option>").join("");
+  if (cur) sel.value = cur;
+}
+
+function certDraft(){
+  const m = members.find(x => x.id === $("certMember").value);
+  return {
+    name: m ? (m.full_name || m.email) : "Participant Name",
+    event: $("certEvent").value.trim() || "Webinar Title",
+    dates: $("certDates").value.trim(),
+    issue: $("certIssue").value || new Date().toISOString().slice(0,10),
+    serial: "SRDC-PREVIEW",
+    code: "PRVW-0000-0000"
+  };
+}
+
+let certPreviewTimer = null;
+function scheduleCertPreview(){
+  clearTimeout(certPreviewTimer);
+  certPreviewTimer = setTimeout(updateCertPreview, 300);
+}
+async function updateCertPreview(){
+  const host = $("certPreviewHost");
+  if (!certPreviewEl) certPreviewEl = mountCert(host, "b");
+  await fillCert(certPreviewEl, certDraft());
+}
+["certMember","certEvent","certDates","certIssue"].forEach(id => {
+  $(id).addEventListener("input", scheduleCertPreview);
+  $(id).addEventListener("change", scheduleCertPreview);
+});
+
+// Scans existing serials with the same SRDC-<series>-<year>- prefix and
+// increments the highest one found — same logic as the standalone generator.
+async function nextSerial(series, year){
+  const prefix = "SRDC-" + series + "-" + year + "-";
+  const { data } = await sb.from("certificates").select("serial")
+    .ilike("serial", prefix + "%").order("serial", { ascending:false }).limit(1);
+  let n = 1;
+  if (data && data[0]) {
+    const num = parseInt(data[0].serial.split("-").pop(), 10);
+    if (!isNaN(num)) n = num + 1;
+  }
+  return prefix + String(n).padStart(4, "0");
+}
+
+$("certForm").addEventListener("submit", async e => {
+  e.preventDefault();
+  const btn = $("certIssueBtn");
+  const m = members.find(x => x.id === $("certMember").value);
+  if (!m) return msg("certMsg", "Pumili muna ng member.");
+  const event = $("certEvent").value.trim();
+  const issue = $("certIssue").value;
+  if (!event || !issue) return msg("certMsg", "Kailangan ng webinar title at issue date.");
+  const dates = $("certDates").value.trim();
+  const series = ($("certSeries").value.trim() || "EBW").toUpperCase();
+  const year = issue.slice(0,4);
+  const name = m.full_name || m.email;
+
+  btn.disabled = true;
+  btn.textContent = "Issuing...";
+  try {
+    const serial = await nextSerial(series, year);
+    const code = await makeCode(serial, name, dates, issue);
+    const rec = {
+      user_id: m.id, serial, series, name, event, dates: dates || null,
+      issue, code, sign_name: "Coach Se Rell", sign_title: "SRDC", status: "valid"
+    };
+    const { error } = await sb.from("certificates").insert(rec);
+    if (error) throw error;
+    msg("certMsg", "Na-issue na ang certificate — " + serial, "ok");
+    $("certEvent").value = ""; $("certDates").value = ""; $("certMember").value = "";
+    scheduleCertPreview();
+    loadCertificates();
+  } catch(err) {
+    msg("certMsg", esc(err.message || "Something went wrong."));
+  } finally {
+    btn.disabled = false;
+    btn.textContent = "Issue Certificate";
+  }
+});
+
+async function loadCertificates(){
+  populateCertMemberSelect();
+  if (!$("certIssue").value) $("certIssue").value = new Date().toISOString().slice(0,10);
+  scheduleCertPreview();
+  const { data, error } = await sb.from("certificates").select("*").order("created_at", { ascending:false });
+  if (error) return msg("certTblMsg", esc(error.message));
+  certs = data || [];
+  renderCertTable();
+}
+
+$("certQ").oninput = renderCertTable;
+
+function renderCertTable(){
+  const q = ($("certQ").value || "").toLowerCase();
+  const list = certs.filter(c => !q || (c.name + " " + c.serial + " " + c.event).toLowerCase().includes(q));
+  if (!list.length) {
+    $("certBody").innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:36px">' +
+      (certs.length ? "No results found." : "Wala pang na-issue na certificate.") + "</td></tr>";
+    return;
+  }
+  $("certBody").innerHTML = list.map(c => "<tr>" +
+    "<td><code style='font-size:12px'>" + esc(c.serial) + "</code></td>" +
+    "<td><b>" + esc(c.name) + "</b></td>" +
+    "<td>" + esc(c.event) + (c.dates ? "<br><small style='color:var(--muted)'>" + esc(c.dates) + "</small>" : "") + "</td>" +
+    "<td>" + fmt(c.issue) + "</td>" +
+    '<td><span class="st ' + (c.status === "valid" ? "st-approved" : "st-rejected") + '">' + esc(c.status) + "</span></td>" +
+    '<td class="actions">' +
+      '<button class="btn ghost sm" data-pdf="' + c.id + '">PDF</button>' +
+      '<button class="btn ghost sm" data-link="' + c.id + '">Copy Link</button>' +
+      '<button class="btn ' + (c.status === "valid" ? "bad" : "ok") + ' sm" data-toggle="' + c.id + '">' +
+        (c.status === "valid" ? "Revoke" : "Restore") + "</button>" +
+    "</td></tr>").join("");
+
+  $("certBody").querySelectorAll("[data-pdf]").forEach(b => {
+    b.onclick = async () => {
+      const c = certs.find(x => x.id === b.dataset.pdf);
+      const orig = b.textContent;
+      b.disabled = true; b.textContent = "...";
+      try { await downloadCertPdf(c); }
+      catch(err) { alert("Could not generate PDF: " + (err.message || err)); }
+      b.disabled = false; b.textContent = orig;
+    };
+  });
+  $("certBody").querySelectorAll("[data-link]").forEach(b => {
+    b.onclick = () => {
+      const c = certs.find(x => x.id === b.dataset.link);
+      navigator.clipboard.writeText(verifyUrl(c.serial, c.code));
+      const orig = b.textContent;
+      b.textContent = "Copied"; setTimeout(() => b.textContent = orig, 1600);
+    };
+  });
+  $("certBody").querySelectorAll("[data-toggle]").forEach(b => {
+    b.onclick = async () => {
+      const c = certs.find(x => x.id === b.dataset.toggle);
+      const next = c.status === "valid" ? "revoked" : "valid";
+      if (!confirm((next === "revoked" ? "Revoke" : "Restore") + " certificate " + c.serial + "?")) return;
+      const { error } = await sb.from("certificates").update({ status: next }).eq("id", c.id);
+      if (error) return msg("certTblMsg", esc(error.message));
+      msg("certTblMsg", "Updated.", "ok");
+      loadCertificates();
+    };
+  });
+}
+
+async function downloadCertPdf(c){
+  const host = document.createElement("div");
+  host.style.position = "fixed"; host.style.left = "-99999px"; host.style.top = "0";
+  document.body.appendChild(host);
+  try {
+    const el = mountCert(host, "b");
+    await fillCert(el, c);
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const canvas = await html2canvas(el, { scale:3, useCORS:true });
+    const img = canvas.toDataURL("image/jpeg", 0.95);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:"landscape", unit:"px", format:[1123,794] });
+    pdf.addImage(img, "JPEG", 0, 0, 1123, 794);
+    pdf.save(c.serial + "_" + c.name.replace(/\s+/g,"_").toLowerCase() + ".pdf");
+  } finally {
+    host.remove();
+  }
+}
+
+$("expCert").onclick = () => {
+  const rows = certs.map(c => [c.serial, c.name, c.event, c.dates || "", fmt(c.issue), c.code, c.status]);
+  downloadCSV("certificates.csv", toCSV(rows, ["Serial","Member","Event","Dates","Issue Date","Code","Status"]));
+};
 </script>
 </body>
 </html>

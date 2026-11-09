@@ -90,6 +90,7 @@
       <button class="chip on" data-view="browse">Browse Products</button>
       <button class="chip" data-view="downloads">My Downloads</button>
       <button class="chip" data-view="saved" id="savedChip">Saved</button>
+      <button class="chip" data-view="certificates">My Certificates</button>
       <button class="chip" data-view="suggest">Suggest a Product</button>
       <button class="chip" data-view="resources">Resources</button>
       <button class="chip" data-view="invite">Invite &amp; Earn</button>
@@ -189,6 +190,13 @@
       <div class="grid" id="savedGrid"><div class="empty">Loading saved items...</div></div>
     </section>
 
+    <!-- ═══════ MY CERTIFICATES ═══════ -->
+    <section id="view-certificates" class="hide">
+      <h2 class="section-title">My Certificates</h2>
+      <div id="certMsgMember" class="msg hide"></div>
+      <div class="grid" id="certGrid"><div class="empty">Loading your certificates...</div></div>
+    </section>
+
     <!-- ═══════ SUGGEST A PRODUCT ═══════ -->
     <section id="view-suggest" class="hide">
       <h2 class="section-title">Suggest a Product</h2>
@@ -263,6 +271,33 @@
   </div>
 </div>
 
+<!-- ═══════ CERTIFICATE PREVIEW MODAL ═══════ -->
+<div id="certModal" class="modal hide">
+  <div class="modal-box" style="max-width:720px">
+    <h3 id="certModalTitle">Certificate</h3>
+    <div style="overflow:auto;border:1px solid var(--line);border-radius:10px;background:#0b1226;padding:12px;margin-bottom:16px">
+      <div style="width:561.5px;height:397px">
+        <div id="certModalHost" style="width:1123px;height:794px;transform:scale(.5);transform-origin:top left"></div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn ghost" id="certModalClose">Close</button>
+      <a class="btn ghost" id="certModalVerify" href="#" target="_blank" rel="noopener">Verify</a>
+      <button class="btn" id="certModalDl">Download PDF</button>
+    </div>
+  </div>
+</div>
+
+<script src="certs/sig.js?v=1"></script>
+<script src="certs/assets.js?v=1"></script>
+<script src="certs/cert.js?v=1"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=Inter:wght@400;500;600;700&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="certs/cert.css?v=1">
 <script src="config.js?v=11"></script>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
@@ -359,7 +394,7 @@ function updateSavedCount(){
 }
 
 /* ─────── VIEW NAV ─────── */
-const VIEWS = ["browse","downloads","saved","suggest","resources","invite","refer","faq"];
+const VIEWS = ["browse","downloads","saved","certificates","suggest","resources","invite","refer","faq"];
 document.querySelectorAll("#viewNav [data-view]").forEach(b => {
   b.onclick = () => {
     document.querySelectorAll("#viewNav [data-view]").forEach(x => x.classList.remove("on"));
@@ -367,6 +402,7 @@ document.querySelectorAll("#viewNav [data-view]").forEach(b => {
     VIEWS.forEach(v => $("view-" + v).classList.toggle("hide", v !== b.dataset.view));
     if (b.dataset.view === "downloads") loadDownloadHistory();
     if (b.dataset.view === "saved") renderSaved();
+    if (b.dataset.view === "certificates") loadMyCertificates();
     if (b.dataset.view === "suggest") loadSuggestions();
     if (b.dataset.view === "resources") loadResources();
     if (b.dataset.view === "invite") setupInvite();
@@ -754,6 +790,88 @@ $("previewClose").onclick = closePreview;
 $("previewModal").addEventListener("click", e => { if (e.target.id === "previewModal") closePreview(); });
 document.addEventListener("keydown", e => { if (e.key === "Escape") closePreview(); });
 $("previewDl").onclick = () => download($("previewDl"));
+
+/* ─────── MY CERTIFICATES ─────── */
+// RLS on public.certificates lets a member select only their own rows
+// (user_id = auth.uid()), so this is a plain client-side select.
+let myCerts = [];
+let certModalEl = null;
+
+async function loadMyCertificates(){
+  const { data, error } = await sb.from("certificates")
+    .select("*").order("created_at", { ascending:false });
+  if (error) {
+    $("certGrid").innerHTML = '<div class="empty">' + ICON_WARN + 'Could not load certificates.<br><small>' +
+      esc(error.message) + '</small></div>';
+    return;
+  }
+  myCerts = data || [];
+  renderMyCertificates();
+}
+
+function renderMyCertificates(){
+  if (!myCerts.length) {
+    $("certGrid").innerHTML = '<div class="empty">' + ICON_SEARCH +
+      "Wala ka pang certificate. Lalabas dito ang mga certificate mo kapag na-issue na ng admin." + "</div>";
+    return;
+  }
+  $("certGrid").innerHTML = myCerts.map(c =>
+    '<article class="card"><div class="card-body">' +
+      "<h3>" + esc(c.event) + "</h3>" +
+      "<p>" + (c.dates ? "Held on " + esc(c.dates) + ". " : "") + "Issued " + esc(fmtDate(c.issue)) + "." + "</p>" +
+      '<div class="meta">' +
+        '<span class="pill">' + esc(c.serial) + "</span>" +
+        (c.status === "revoked" ? '<span class="pill" style="color:var(--danger)">Revoked</span>' : "") +
+      "</div>" +
+      '<button class="btn full" data-view-cert="' + c.id + '">View &amp; Download</button>' +
+    "</div></article>"
+  ).join("");
+
+  $("certGrid").querySelectorAll("[data-view-cert]").forEach(b => {
+    b.onclick = () => openCertModal(myCerts.find(x => x.id === b.dataset.viewCert));
+  });
+}
+
+async function openCertModal(c){
+  if (!c) return;
+  $("certModalTitle").textContent = c.event;
+  $("certModalVerify").href = verifyUrl(c.serial, c.code);
+  $("certModalDl").dataset.id = c.id;
+  $("certModal").classList.remove("hide");
+  const host = $("certModalHost");
+  if (!certModalEl) certModalEl = mountCert(host, "b");
+  await fillCert(certModalEl, c);
+}
+function closeCertModal(){ $("certModal").classList.add("hide"); }
+$("certModalClose").onclick = closeCertModal;
+$("certModal").addEventListener("click", e => { if (e.target.id === "certModal") closeCertModal(); });
+
+$("certModalDl").onclick = async () => {
+  const c = myCerts.find(x => x.id === $("certModalDl").dataset.id);
+  if (!c) return;
+  const btn = $("certModalDl");
+  const orig = btn.textContent;
+  btn.disabled = true; btn.textContent = "Preparing...";
+  try {
+    const host = document.createElement("div");
+    host.style.position = "fixed"; host.style.left = "-99999px"; host.style.top = "0";
+    document.body.appendChild(host);
+    const el = mountCert(host, "b");
+    await fillCert(el, c);
+    if (document.fonts && document.fonts.ready) await document.fonts.ready;
+    const canvas = await html2canvas(el, { scale:3, useCORS:true });
+    const img = canvas.toDataURL("image/jpeg", 0.95);
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF({ orientation:"landscape", unit:"px", format:[1123,794] });
+    pdf.addImage(img, "JPEG", 0, 0, 1123, 794);
+    pdf.save(c.serial + "_" + c.name.replace(/\s+/g,"_").toLowerCase() + ".pdf");
+    host.remove();
+  } catch(err) {
+    alert("Could not generate PDF: " + (err.message || err));
+  } finally {
+    btn.disabled = false; btn.textContent = orig;
+  }
+};
 
 /* ─────── SUGGEST A PRODUCT ─────── */
 $("suggestForm").addEventListener("submit", async e => {
