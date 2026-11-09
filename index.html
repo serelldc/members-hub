@@ -812,8 +812,12 @@ function certFillData(c){
 }
 
 async function loadMyCertificates(){
+  // RLS lets admins read every row (needed for the Admin > Certificates
+  // tab), so this page must still filter to the signed-in user's own
+  // certificates explicitly — otherwise an admin account would see
+  // everyone's certificates here instead of just their own.
   const { data, error } = await sb.from("certificates")
-    .select("*").order("created_at", { ascending:false });
+    .select("*").eq("user_id", userId).order("created_at", { ascending:false });
   if (error) {
     $("certGrid").innerHTML = '<div class="empty">' + ICON_WARN + 'Could not load certificates.<br><small>' +
       esc(error.message) + '</small></div>';
