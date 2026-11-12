@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Digz Members</title>
-<link rel="stylesheet" href="style.css?v=13">
+<link rel="stylesheet" href="style.css?v=14">
 <script>(function(){try{
   if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light");
   if(localStorage.getItem("fontsize")==="large")document.documentElement.setAttribute("data-fontsize","large");
@@ -255,6 +255,7 @@
     <section id="view-invite" class="hide">
       <h2 class="section-title">Invite &amp; Earn</h2>
       <div id="inviteBox" class="gcash-box">Loading...</div>
+      <div id="inviteLeaderboard" class="gcash-box hide"></div>
     </section>
 
     <!-- ═══════ REFER A FRIEND ═══════ -->
@@ -1118,14 +1119,17 @@ async function setupInvite(){
   const box = $("inviteBox");
   const link = location.origin + location.pathname + "?ref=" + encodeURIComponent(profile.referral_code || "");
 
-  const [{ data: countData }, { data: earnings, error: eErr }] = await Promise.all([
+  const [{ data: countData }, { data: earnings, error: eErr }, { data: board }] = await Promise.all([
     sb.rpc("my_referral_count"),
-    sb.from("referral_earnings").select("*").order("created_at", { ascending:false })
+    sb.from("referral_earnings").select("*").order("created_at", { ascending:false }),
+    sb.rpc("referral_leaderboard", { limit_n: 5 })
   ]);
   const referred = countData ?? 0;
   const rows = earnings || [];
   const pendingTotal = rows.filter(r => r.status === "pending").reduce((s,r) => s + Number(r.amount), 0);
   const paidTotal = rows.filter(r => r.status === "paid").reduce((s,r) => s + Number(r.amount), 0);
+  const top = board || [];
+  const medal = i => ["🥇","🥈","🥉"][i] || (i+1) + ".";
 
   box.innerHTML =
     '<p style="color:var(--muted);font-size:13.5px;margin-bottom:18px;line-height:1.6">' +
@@ -1151,6 +1155,25 @@ async function setupInvite(){
     $("copyInviteLink").textContent = "Copied";
     setTimeout(() => $("copyInviteLink").textContent = "Copy Link", 1800);
   };
+
+  // Leaderboard — shows first name + last initial only (no emails/full
+  // profiles), via the referral_leaderboard() RPC which is a narrow
+  // SECURITY DEFINER aggregate, same pattern as my_referral_count().
+  if (top.length) {
+    $("inviteLeaderboard").classList.remove("hide");
+    $("inviteLeaderboard").innerHTML =
+      '<h3 style="font-size:15.5px;font-weight:700;margin-bottom:12px">🏆 Top Inviters</h3>' +
+      '<div class="leaderboard-list">' +
+        top.map((r, i) =>
+          '<div class="leaderboard-row">' +
+            '<span class="lb-rank">' + medal(i) + '</span>' +
+            '<span class="lb-name">' + esc(r.display_name) + '</span>' +
+            '<span class="lb-count">' + r.referred_count + (r.referred_count == 1 ? " invite" : " invites") + '</span>' +
+          '</div>').join("") +
+      '</div>';
+  } else {
+    $("inviteLeaderboard").classList.add("hide");
+  }
 }
 
 /* ─────── REFER A FRIEND ─────── */

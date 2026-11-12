@@ -263,7 +263,16 @@
             <input type="text" id="certName" placeholder="Pangalan na lalabas sa certificate" required></div>
           <div class="hint" style="margin:-6px 0 12px">Auto-fill mula sa profile pag pumili ng member — pwede mo pang i-edit (hal. may title na Dr., ibang spelling, atbp).</div>
           <div class="field"><label for="certEvent">Webinar / Seminar Title</label>
-            <input type="text" id="certEvent" placeholder="E-Book Writing with use of AI Tools" required></div>
+            <input type="text" id="certEvent" list="certEventPresets" placeholder="E-Book Writing with use of AI Tools" required>
+            <datalist id="certEventPresets">
+              <option value="1 Taon na Miyembro sa Digz 🎉"></option>
+              <option value="Pinaka-Aktibong Referrer ng Buwan 🏆"></option>
+              <option value="Top Download ng Buwan ⭐"></option>
+              <option value="Loyal Member Appreciation 💛"></option>
+              <option value="5 Successful Referrals Milestone 🚀"></option>
+            </datalist>
+            <div class="hint">Mag-type para sa webinar title, o pumili sa suggestions para sa milestone/appreciation certificates.</div>
+          </div>
           <div class="field"><label for="certDates">Dates Held (optional)</label>
             <input type="text" id="certDates" placeholder="October 25, 2026"></div>
           <div class="row2">

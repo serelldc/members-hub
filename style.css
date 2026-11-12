@@ -212,6 +212,14 @@ main{max-width:1180px;margin:0 auto;padding:26px 22px 80px;position:relative;z-i
 
 .gcash-box{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:26px;margin-bottom:20px}
 .gcash-box h3{font-size:15.5px;font-weight:700;margin-bottom:14px}
+.leaderboard-list{display:flex;flex-direction:column;gap:2px}
+.leaderboard-row{display:flex;align-items:center;gap:12px;padding:10px 4px;border-bottom:1px solid var(--line)}
+.leaderboard-row:last-child{border-bottom:none}
+.leaderboard-row .lb-rank{width:26px;text-align:center;font-size:15px;font-weight:700;flex-shrink:0}
+.leaderboard-row .lb-name{flex:1;font-size:14px;font-weight:600}
+.leaderboard-row .lb-count{font-size:12.5px;color:var(--muted);font-weight:600}
+html[data-fontsize="large"] .leaderboard-row .lb-name{font-size:16px}
+html[data-fontsize="large"] .leaderboard-row .lb-count{font-size:14.5px}
 .gcash-num{background:var(--bg2);border:1px solid var(--line);border-radius:9px;padding:16px 18px;display:flex;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap}
 .gcash-num .big{font-size:21px;font-weight:700;letter-spacing:.4px}
 .gcash-num .nm{font-size:12.5px;color:var(--muted)}
