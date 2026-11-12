@@ -88,15 +88,11 @@
 
     <div class="chips" id="viewNav">
       <button class="chip on" data-view="browse">Browse Products</button>
-      <button class="chip" data-view="downloads">My Downloads</button>
-      <button class="chip" data-view="saved" id="savedChip">Saved</button>
-      <button class="chip" data-view="certificates">My Certificates</button>
-      <button class="chip" data-view="suggest">Suggest a Product</button>
-      <button class="chip" data-view="resources">Resources</button>
-      <button class="chip" data-view="invite">Invite &amp; Earn</button>
-      <button class="chip" data-view="refer">Refer a Friend</button>
-      <button class="chip" data-view="faq">FAQ</button>
+      <button class="chip" data-group="mystuff">My Stuff</button>
+      <button class="chip" data-group="earn">Earn &amp; Refer</button>
+      <button class="chip" data-group="help">Help</button>
     </div>
+    <div class="chips hide" id="subNav"></div>
 
     <!-- ═══════ BROWSE ═══════ -->
     <section id="view-browse">
@@ -398,22 +394,75 @@ function toggleSaved(id){
 }
 function updateSavedCount(){
   const n = getSavedIds().length;
-  $("savedChip").textContent = "Saved" + (n ? " (" + n + ")" : "");
+  const label = "Saved" + (n ? " (" + n + ")" : "");
+  // the "Saved" chip only exists in the DOM while the "My Stuff" group is
+  // open (it's rendered into #subNav), so just update it if it's there —
+  // it'll be re-rendered with the current count next time the group opens.
+  const chip = document.querySelector('#subNav [data-view="saved"]');
+  if (chip) chip.textContent = label;
 }
 
 /* ─────── VIEW NAV ─────── */
+// Grouped so the top-level nav stays short (easier for members who find a
+// long row of buttons hard to navigate) — each group opens a second row of
+// chips for its actual views, which keep their original ids/loaders.
 const VIEWS = ["browse","downloads","saved","certificates","suggest","resources","invite","refer","faq"];
-document.querySelectorAll("#viewNav [data-view]").forEach(b => {
+const GROUPS = {
+  mystuff: [
+    { view: "downloads",    label: "My Downloads" },
+    { view: "saved",        label: "Saved" },
+    { view: "certificates", label: "My Certificates" }
+  ],
+  earn: [
+    { view: "invite", label: "Invite & Earn" },
+    { view: "refer",  label: "Refer a Friend" }
+  ],
+  help: [
+    { view: "resources", label: "Resources" },
+    { view: "suggest",   label: "Suggest a Product" },
+    { view: "faq",       label: "FAQ" }
+  ]
+};
+const VIEW_LOADERS = {
+  downloads: loadDownloadHistory,
+  saved: renderSaved,
+  certificates: loadMyCertificates,
+  suggest: loadSuggestions,
+  resources: loadResources,
+  invite: setupInvite
+};
+function showView(view){
+  VIEWS.forEach(v => $("view-" + v).classList.toggle("hide", v !== view));
+  if (VIEW_LOADERS[view]) VIEW_LOADERS[view]();
+}
+function openGroup(groupKey, preferredView){
+  const items = GROUPS[groupKey];
+  const target = items.find(i => i.view === preferredView) || items[0];
+  $("subNav").classList.remove("hide");
+  $("subNav").innerHTML = items.map(i =>
+    '<button class="chip' + (i.view === target.view ? ' on' : '') + '" data-view="' + i.view + '">' + i.label + '</button>'
+  ).join("");
+  $("subNav").querySelectorAll("[data-view]").forEach(sb => {
+    sb.onclick = () => {
+      $("subNav").querySelectorAll("[data-view]").forEach(x => x.classList.remove("on"));
+      sb.classList.add("on");
+      showView(sb.dataset.view);
+    };
+  });
+  showView(target.view);
+  updateSavedCount();
+}
+document.querySelectorAll("#viewNav [data-view],#viewNav [data-group]").forEach(b => {
   b.onclick = () => {
-    document.querySelectorAll("#viewNav [data-view]").forEach(x => x.classList.remove("on"));
+    document.querySelectorAll("#viewNav .chip").forEach(x => x.classList.remove("on"));
     b.classList.add("on");
-    VIEWS.forEach(v => $("view-" + v).classList.toggle("hide", v !== b.dataset.view));
-    if (b.dataset.view === "downloads") loadDownloadHistory();
-    if (b.dataset.view === "saved") renderSaved();
-    if (b.dataset.view === "certificates") loadMyCertificates();
-    if (b.dataset.view === "suggest") loadSuggestions();
-    if (b.dataset.view === "resources") loadResources();
-    if (b.dataset.view === "invite") setupInvite();
+    if (b.dataset.group) {
+      openGroup(b.dataset.group);
+    } else {
+      $("subNav").classList.add("hide");
+      $("subNav").innerHTML = "";
+      showView(b.dataset.view);
+    }
   };
 });
 
