@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Digz Members</title>
-<link rel="stylesheet" href="style.css?v=11">
+<link rel="stylesheet" href="style.css?v=12">
 <script>(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light");}catch(e){}})();</script>
 </head>
 <body>
@@ -67,8 +67,13 @@
 
   <main>
     <section class="hero">
-      <h2 id="greet">Welcome!</h2>
-      <p id="heroSub"></p>
+      <div class="hero-top">
+        <div class="hero-avatar" id="heroAvatar">?</div>
+        <div class="hero-greet">
+          <h2 id="greet">Welcome!</h2>
+          <p id="heroSub"></p>
+        </div>
+      </div>
       <p id="aboutTxt" class="hero-about"></p>
     </section>
 
@@ -570,13 +575,17 @@ async function boot(){
   profile = prof || { full_name: user.email.split("@")[0], tier: "free", is_admin: false };
 
   // Generic greeting — not time-of-day based, since members are spread
-  // across different timezones and locations.
+  // across different timezones and locations. Kept warm/personal (name +
+  // avatar initial + friendlier phrasing) instead of a flat transactional
+  // line, per Rell's request to make the welcome area more welcoming.
   const first = (profile.full_name || "Member").split(" ")[0];
-  $("greet").textContent = "Welcome, Digz " + first + "!";
-  $("heroSub").textContent = "Below is everything included in your " +
-    profile.tier.toUpperCase() + " membership. Click Download to get the file.";
+  $("greet").textContent = "Kumusta, Digz " + first + "! 👋";
+  $("heroSub").innerHTML = "Masaya kaming nandito ka! Narito ang lahat ng kasama sa iyong <b>" +
+    profile.tier.toUpperCase() + "</b> membership — mag-browse, mag-download, at tuklasin ang mga bago naming idinagdag para sa'yo.";
   $("memberName").textContent = profile.full_name || user.email;
-  $("avatar").textContent = (profile.full_name || user.email).charAt(0).toUpperCase();
+  const initial = (profile.full_name || user.email).charAt(0).toUpperCase();
+  $("avatar").textContent = initial;
+  $("heroAvatar").textContent = initial;
   const tb = $("memberTier");
   tb.textContent = profile.tier;
   tb.className = "tier-badge tier-" + profile.tier;
