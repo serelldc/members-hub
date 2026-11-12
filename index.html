@@ -5,15 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="robots" content="noindex, nofollow">
 <title>Digz Members</title>
-<link rel="stylesheet" href="style.css?v=12">
-<script>(function(){try{if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light");}catch(e){}})();</script>
+<link rel="stylesheet" href="style.css?v=13">
+<script>(function(){try{
+  if(localStorage.getItem("theme")==="light")document.documentElement.setAttribute("data-theme","light");
+  if(localStorage.getItem("fontsize")==="large")document.documentElement.setAttribute("data-fontsize","large");
+}catch(e){}})();</script>
 </head>
 <body>
 
 <!-- ═══════════════ AUTH ═══════════════ -->
 <div id="authView" class="auth-wrap hide">
   <div class="auth-box">
-    <button class="theme-toggle" id="themeToggleAuth" title="Switch light / dark mode" aria-label="Switch light / dark mode"></button>
+    <div class="corner-controls">
+      <button class="theme-toggle text-toggle" id="fontToggleAuth" title="Paramihin ang laki ng text" aria-label="Paramihin ang laki ng text">A+</button>
+      <button class="theme-toggle" id="themeToggleAuth" title="Switch light / dark mode" aria-label="Switch light / dark mode"></button>
+    </div>
     <div class="brand-mark"><img src="brand-logo.png" alt=""></div>
     <h1 id="brandTitle">Digz Members</h1>
     <p class="sub" id="brandSub"></p>
@@ -54,6 +60,7 @@
     <div class="topbar-in">
       <a class="logo" href="#"><img src="brand-logo.png" alt=""><span id="navName">Digz Members</span></a>
       <div class="spacer"></div>
+      <button class="theme-toggle text-toggle" id="fontToggleApp" title="Paramihin ang laki ng text" aria-label="Paramihin ang laki ng text">A+</button>
       <button class="theme-toggle" id="themeToggleApp" title="Switch light / dark mode" aria-label="Switch light / dark mode"></button>
       <a href="admin.html" class="btn ghost sm hide" id="adminLink">Admin</a>
       <div class="who">
@@ -76,6 +83,17 @@
       </div>
       <p id="aboutTxt" class="hero-about"></p>
     </section>
+
+    <div id="guideBox" class="guide-box hide">
+      <button class="guide-close" id="guideClose" title="Isara ang gabay" aria-label="Isara ang gabay">✕</button>
+      <h3>👋 Unang Beses Dito? Simple Lang</h3>
+      <ol class="guide-steps">
+        <li><b>Browse Products</b> — dito makikita lahat ng pwede mong i-download. Pindutin lang ang "Download" button sa product na gusto mo.</li>
+        <li><b>My Stuff</b> — dito makikita ang mga na-download mo na, na-save mo, at ang mga certificate mo.</li>
+        <li><b>Earn &amp; Refer</b> — dito makikita kung paano kumita sa pag-imbita ng kaibigan.</li>
+        <li><b>Help</b> — dito may mga kapaki-pakinabang na links, pwede kang mag-suggest ng product, at may sagot sa mga madalas itanong.</li>
+      </ol>
+    </div>
 
     <div id="announce" class="msg warn hide"></div>
     <div id="payStatus" class="msg hide"></div>
@@ -228,6 +246,7 @@
     <section id="view-resources" class="hide">
       <h2 class="section-title">Resources &amp; Tools</h2>
       <p style="color:var(--muted);font-size:13.5px;margin-bottom:18px;line-height:1.6">Useful links and tools for making ebooks, templates, and other digital products.</p>
+      <button class="btn ghost sm" id="showGuideBtn" style="margin-bottom:18px">👋 Ipakita ulit ang gabay sa paggamit ng hub</button>
       <div class="chips" id="resChips"></div>
       <div class="grid" id="resGrid"><div class="empty">Loading resources...</div></div>
     </section>
@@ -333,6 +352,47 @@ function toggleTheme(){
 applyTheme(document.documentElement.getAttribute("data-theme") === "light" ? "light" : "dark");
 $("themeToggleAuth").onclick = toggleTheme;
 $("themeToggleApp").onclick = toggleTheme;
+
+/* ─────── TEXT SIZE TOGGLE (accessibility) ─────── */
+// Scoped font-size bumps (see style.css, html[data-fontsize="large"]) on
+// navigational/content text only — deliberately excludes the certificate
+// renderer, which has fixed print dimensions the PDF export depends on.
+function applyFontSize(size){
+  document.documentElement.setAttribute("data-fontsize", size);
+  try { localStorage.setItem("fontsize", size); } catch(e){}
+  const label = size === "large" ? "A−" : "A+";
+  [$("fontToggleAuth"), $("fontToggleApp")].forEach(b => {
+    if (!b) return;
+    b.textContent = label;
+    b.setAttribute("aria-pressed", size === "large");
+    b.title = size === "large" ? "Ibalik sa normal na laki ng text" : "Paramihin ang laki ng text";
+  });
+}
+function toggleFontSize(){
+  applyFontSize(document.documentElement.getAttribute("data-fontsize") === "large" ? "normal" : "large");
+}
+applyFontSize(document.documentElement.getAttribute("data-fontsize") === "large" ? "large" : "normal");
+$("fontToggleAuth").onclick = toggleFontSize;
+$("fontToggleApp").onclick = toggleFontSize;
+
+/* ─────── "PAANO GAMITIN" GUIDE (accessibility) ─────── */
+// Shown by default on first load, dismissible (remembered in localStorage
+// so it doesn't nag returning members), and recoverable via a link inside
+// Help > Resources for anyone who dismissed it and wants it back.
+function initGuide(){
+  let dismissed = false;
+  try { dismissed = localStorage.getItem("hideGuide") === "1"; } catch(e){}
+  if (!dismissed) $("guideBox").classList.remove("hide");
+}
+$("guideClose").onclick = () => {
+  $("guideBox").classList.add("hide");
+  try { localStorage.setItem("hideGuide", "1"); } catch(e){}
+};
+$("showGuideBtn").onclick = () => {
+  try { localStorage.removeItem("hideGuide"); } catch(e){}
+  $("guideBox").classList.remove("hide");
+  $("guideBox").scrollIntoView({ behavior: "smooth", block: "start" });
+};
 
 const ICON_DL = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11"/><path d="M7 11l5 5 5-5"/><path d="M5 20h14"/></svg>';
 const ICON_WARN = '<svg class="empty-ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l10 18H2z"/><path d="M12 9v5"/><circle cx="12" cy="17" r="0.6" fill="currentColor" stroke="none"/></svg>';
@@ -592,6 +652,7 @@ async function boot(){
   if (profile.is_admin) $("adminLink").classList.remove("hide");
 
   updateSavedCount();
+  initGuide();
 
   if (C.announcement) showMsg("announce", C.announcement, "warn");
 
